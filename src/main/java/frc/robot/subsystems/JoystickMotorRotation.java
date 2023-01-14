@@ -7,13 +7,14 @@ import frc.robot.RobotMap.MotorMap;
 public class JoystickMotorRotation extends SubsystemBase
 {
     private static JoystickMotorRotation instance;
-    private CANSparkMax motor;
-
-
+    
     public static JoystickMotorRotation getInstance() {
-        if (instance == null) instance = new JoystickMotorRotation();
-        return instance;
-      }
+      if (instance == null) instance = new JoystickMotorRotation();
+      return instance;
+    }
+    
+    
+    private CANSparkMax motor;
 
     private JoystickMotorRotation()
     {
