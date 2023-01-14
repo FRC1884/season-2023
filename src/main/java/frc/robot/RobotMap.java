@@ -183,4 +183,10 @@ public class RobotMap {
     public static final double OFF_SPEED = 0.0;
     public static final int MOTOR = -1;
   }
+
+  public static class TwoMotorMap
+  {
+    public static final int MOTOR_ONE = 15;
+    public static final int MOTOR_TWO = 16;
+  }
 }
