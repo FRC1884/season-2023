@@ -30,6 +30,12 @@ public class TwoJoyStickDriverMap extends DriverMap {
   }
 
   @Override
+  public double getLeftYAxis()
+  {
+    return controller.getAxis(Axis.AXIS_LEFT_Y);
+  }
+
+  @Override
   public void registerCommands() {
     super.registerCommands();
   }
