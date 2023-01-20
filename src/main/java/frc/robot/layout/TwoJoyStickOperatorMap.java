@@ -38,6 +38,12 @@ public class TwoJoyStickOperatorMap extends OperatorMap{
     }
 
     @Override
+    public JoystickButton getTwoMotorButton()
+    {
+        return controller.getButton(Button.BUTTON_A);
+    }
+
+    @Override
     public void registerCommands() {
         super.registerCommands();
     }
