@@ -34,6 +34,6 @@ public class TwoMotorOpp extends SubsystemBase {
 
   public void rotateMotor()
     {
-        motor1.set(feedForward.calculate(1.0));
+        motor1.setVoltage(feedForward.calculate(1.0));
     }
 }

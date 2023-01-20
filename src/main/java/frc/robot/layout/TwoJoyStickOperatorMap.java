@@ -40,7 +40,7 @@ public class TwoJoyStickOperatorMap extends OperatorMap{
     @Override
     public JoystickButton getTwoMotorButton()
     {
-        return controller.getButton(Button.BUTTON_A);
+        return controller.getButton(Button.BUTTON_B);
     }
 
     @Override
