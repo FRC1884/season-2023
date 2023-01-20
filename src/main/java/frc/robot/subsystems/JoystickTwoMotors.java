@@ -13,6 +13,7 @@ public class JoystickTwoMotors extends SubsystemBase {
     return instance;
   }
 
+
   private CANSparkMax motor1, motor2;
   
   private JoystickTwoMotors() 

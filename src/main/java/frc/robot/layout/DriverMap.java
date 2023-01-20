@@ -1,12 +1,12 @@
 package frc.robot.layout;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.subsystems.FrictionPad;
+import frc.robot.subsystems.PistonSystemOne;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.PixyCam;
 import frc.robot.util.controllers.CommandMap;
 import frc.robot.util.controllers.GameController;
 import frc.robot.subsystems.JoystickMotorRotation;
@@ -31,6 +31,10 @@ public abstract class DriverMap extends CommandMap {
   //abstract JoystickButton getPistonTriggers(); 
 
   abstract JoystickButton getNinetyButton();
+  
+  abstract JoystickButton getPixyCamDistanceButton();
+
+  abstract double getLeftYAxis();
 
   @Override
   public void registerCommands() {
@@ -40,10 +44,17 @@ public abstract class DriverMap extends CommandMap {
 
     pidMotor.setDefaultCommand(pidMotor.rotateWithJoystickCommand(getLeftXAxis(), -getLeftYAxis()));
 
-    FrictionPad frictionPad = FrictionPad.getInstance();
-    getPistonButton().onTrue(new InstantCommand(() -> frictionPad.extendPiston(true)));
     swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
     JoystickMotorRotation joystickMotorRotation = JoystickMotorRotation.getInstance();
+    PistonSystemOne instance = PistonSystemOne.getInstance();
+    getPistonButton().onTrue(new InstantCommand(() -> instance.shootPiston()));
+    
+    JoystickMotorRotation joystickMotorRotation = JoystickMotorRotation.getInstance();
+    swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
+
+    //pixyCam.setDefaultCommand(pixyCam.printCommand());
+    
+    getPixyCamDistanceButton().onTrue(swerve.AlignWithGameObject());
     joystickMotorRotation.setDefaultCommand(new RunCommand(() -> joystickMotorRotation.rotateMotor(getLeftYAxis())));
   }
 }
