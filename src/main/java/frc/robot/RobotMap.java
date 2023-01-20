@@ -176,4 +176,33 @@ public class RobotMap {
     public static final int OPERATOR_JOYSTICK = 1;
     public static final double STICK_DEADBAND = 0.1;
   }
+
+  public static class PistonMap {
+    //temporary values
+    public static final int FORWARD_CHANNEL = 0;
+    public static final int REVERSE_CHANNEL = 0;
+  }
+
+  public static class MotorMap {
+    public static final double FORWARD_SPEED = 1.0;
+    public static final double REVERSE_SPEED = -1.0;
+    public static final double OFF_SPEED = 0.0;
+    public static final int MOTOR = -1;
+  }
+
+  public static class TwoMotorMap
+  {
+    public static final int MOTOR_ONE = 15;
+    public static final int MOTOR_TWO = 16;
+  }
+
+  public static class TwoMotorOppMap
+  {
+    public static final int MOTOR_ONE = 0;
+    public static final int MOTOR_TWO = 0;
+    public static final double kS = 0.1;
+    public static final double kV = 0.1;
+    public static final double kA = 0.0;
+  }
 }
+  
