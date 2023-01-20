@@ -194,6 +194,7 @@ public class RobotMap {
   {
     public static final int MOTOR_ONE = 15;
     public static final int MOTOR_TWO = 16;
+    public static final int MOTOR_THREE = 17;
   }
   
   public static class TwoMotorOppMap

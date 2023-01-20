@@ -8,12 +8,13 @@ public class JoystickTwoMotors extends SubsystemBase {
 
   private static JoystickTwoMotors instance;
     
-    public static JoystickTwoMotors getInstance() {
-      if (instance == null) instance = new JoystickTwoMotors();
-      return instance;
-    }
+  public static JoystickTwoMotors getInstance() {
+    if (instance == null) instance = new JoystickTwoMotors();
+    return instance;
+  }
 
-    private CANSparkMax motor1, motor2;
+
+  private CANSparkMax motor1, motor2;
   
   private JoystickTwoMotors() 
   {

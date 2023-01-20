@@ -9,9 +9,9 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.PixyCam;
 import frc.robot.util.controllers.CommandMap;
 import frc.robot.util.controllers.GameController;
-import pixy2api.Pixy2CCC.Block;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.JoystickMotorRotation;
+import frc.robot.subsystems.PIDMotor;
+
 
 public abstract class DriverMap extends CommandMap {
 
@@ -24,6 +24,14 @@ public abstract class DriverMap extends CommandMap {
 
   abstract JoystickButton getPathPlanningTestButton();
 
+  abstract double getLeftYAxis();
+
+  abstract double getLeftXAxis();
+
+  //abstract JoystickButton getPistonTriggers(); 
+
+  abstract JoystickButton getNinetyButton();
+  
   abstract JoystickButton getPixyCamDistanceButton();
 
   abstract double getLeftYAxis();
@@ -31,6 +39,13 @@ public abstract class DriverMap extends CommandMap {
   @Override
   public void registerCommands() {
     var swerve = Swerve.getInstance();
+    PIDMotor pidMotor = PIDMotor.getInstance();
+    getNinetyButton().onTrue(pidMotor.rotateToNinetyCommand());
+
+    pidMotor.setDefaultCommand(pidMotor.rotateWithJoystickCommand(getLeftXAxis(), -getLeftYAxis()));
+
+    swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
+    JoystickMotorRotation joystickMotorRotation = JoystickMotorRotation.getInstance();
     PistonSystemOne instance = PistonSystemOne.getInstance();
     getPistonButton().onTrue(new InstantCommand(() -> instance.shootPiston()));
     

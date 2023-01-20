@@ -35,13 +35,24 @@ public class TwoJoyStickDriverMap extends DriverMap {
   }
 
   @Override
+  public double getLeftYAxis() {
+    return controller.getAxis(Axis.AXIS_LEFT_Y);
+  }
+  @Override
+  public double getLeftXAxis()
+  {
+      return controller.getAxis(Axis.AXIS_LEFT_X);
+  }
+  /* public JoystickButton getJoystickButton(){
+    return controller.getButton(Button.BUTTON_A);
+  } */
+  public JoystickButton getNinetyButton(){
+    return controller.getButton(Button.BUTTON_A);
+  }
   public JoystickButton getPixyCamDistanceButton() {
     return controller.getButton(Button.BUTTON_B);
    }
 
-  @Override
-  public double getLeftYAxis() {
-    return controller.getAxis(Axis.AXIS_LEFT_Y);
   }
 
   @Override

@@ -28,7 +28,7 @@ public abstract class OperatorMap extends CommandMap {
   public void registerCommands() {
     JoystickTwoMotors joystickTwoMotors = JoystickTwoMotors.getInstance();
     joystickTwoMotors.setDefaultCommand(new RunCommand(() -> joystickTwoMotors.rotateMotor(getLeftXAxis())));
-    
+
     TwoMotorOpp twoMotorOpp = TwoMotorOpp.getInstance();
     getTwoMotorButton().onTrue(new InstantCommand(() -> twoMotorOpp.rotateMotor(), twoMotorOpp));
   }
