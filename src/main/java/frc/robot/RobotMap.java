@@ -171,6 +171,19 @@ public class RobotMap {
     public static final double FIELD_WIDTH = Units.inchesToMeters(27);
   }
 
+  public static class PinkMap{
+    public static final int PIVOT_PORT = 0;
+    public static final int TELESCOPE_PORT = 0;
+    public static final int PIVOT_RATIO = 100;
+    public static final double PIVOT_MIN = 0;
+    public static final double PIVOT_MAX = .75;
+    public static final int TELESCOPE_RATIO = 40;
+    public static final double TELESCOPE_MIN = 0;//assuming it starts as spooled as possible
+    public static final double TELESCOPE_MAX = 4;//should be in terms of rotations of the larger gear
+
+
+  }
+
   public static class ControllerMap {
     public static final int DRIVER_JOYSTICK = 0;
     public static final int OPERATOR_JOYSTICK = 1;
