@@ -33,7 +33,7 @@ public class PistonSystemOne extends SubsystemBase {
    * Cheack how to make it static
    */
   private PistonSystemOne() {   
-        piston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,PistonMap.FOWARD_CHANNEL, PistonMap.REVERSE_CHANNEL);   
+    piston = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,PistonMap.FORWARD_CHANNEL, PistonMap.REVERSE_CHANNEL);   
   }
 
   public void shootPiston(){
