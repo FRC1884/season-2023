@@ -22,13 +22,16 @@ public abstract class OperatorMap extends CommandMap {
 
   public abstract double getLeftXAxis();
 
+  public abstract JoystickButton getTwoMotorButton(); 
+
  
 
   @Override
   public void registerCommands() {
-   // JoystickTwoMotors joystickTwoMotors = JoystickTwoMotors.getInstance();
-   // joystickTwoMotors.setDefaultCommand(new RunCommand(() -> joystickTwoMotors.rotateMotor(getLeftXAxis()), joystickTwoMotors));
-    
-    
+    JoystickTwoMotors joystickTwoMotors = JoystickTwoMotors.getInstance();
+    joystickTwoMotors.setDefaultCommand(new RunCommand(() -> joystickTwoMotors.rotateMotor(getLeftXAxis())));
+
+    TwoMotorOpp twoMotorOpp = TwoMotorOpp.getInstance();
+    getTwoMotorButton().onTrue(new InstantCommand(() -> twoMotorOpp.rotateMotor(), twoMotorOpp));
   }
 }

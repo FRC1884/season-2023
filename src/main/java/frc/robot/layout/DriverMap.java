@@ -14,6 +14,8 @@ import pixy2api.Pixy2CCC.Block;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.BeamBreakMotors;
 import frc.robot.subsystems.JoystickMotorRotation;
+import frc.robot.subsystems.PIDMotor;
+
 
 public abstract class DriverMap extends CommandMap {
 
@@ -26,17 +28,30 @@ public abstract class DriverMap extends CommandMap {
 
   abstract JoystickButton getPathPlanningTestButton();
 
-  //abstract JoystickButton getPixyCamDistanceButton();
-
   abstract double getLeftYAxis();
+
+  abstract double getLeftXAxis();
+
+  //abstract JoystickButton getPistonTriggers(); 
+
+  abstract JoystickButton getNinetyButton();
+  
+  abstract JoystickButton getPixyCamDistanceButton();
 
   public abstract JoystickButton getTwoMotorButton();
 
   @Override
   public void registerCommands() {
-    // var swerve = Swerve.getInstance();
-    // PistonSystemOne instance = PistonSystemOne.getInstance();
-    // getPistonButton().onTrue(new InstantCommand(() -> instance.shootPiston()));
+    var swerve = Swerve.getInstance();
+    PIDMotor pidMotor = PIDMotor.getInstance();
+    getNinetyButton().onTrue(pidMotor.rotateToNinetyCommand());
+
+    pidMotor.setDefaultCommand(pidMotor.rotateWithJoystickCommand(getLeftXAxis(), -getLeftYAxis()));
+
+    swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
+    JoystickMotorRotation joystickMotorRotation = JoystickMotorRotation.getInstance();
+    PistonSystemOne instance = PistonSystemOne.getInstance();
+    getPistonButton().onTrue(new InstantCommand(() -> instance.shootPiston()));
     
     // JoystickMotorRotation joystickMotorRotation = JoystickMotorRotation.getInstance();
     // swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
