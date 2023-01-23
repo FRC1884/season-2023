@@ -37,11 +37,7 @@ public class TwoJoyStickOperatorMap extends OperatorMap{
         return controller.getAxis(Axis.AXIS_LEFT_X);
     }
 
-    @Override
-    public JoystickButton getTwoMotorButton()
-    {
-        return controller.getButton(Button.BUTTON_B);
-    }
+    
 
     @Override
     public void registerCommands() {

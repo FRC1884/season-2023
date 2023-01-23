@@ -192,17 +192,25 @@ public class RobotMap {
 
   public static class TwoMotorMap
   {
-    public static final int MOTOR_ONE = 15;
-    public static final int MOTOR_TWO = 16;
+    public static final int MOTOR_ONE = 0;
+    public static final int MOTOR_TWO = 0;
   }
   
   public static class TwoMotorOppMap
   {
-    public static final int MOTOR_ONE = 0;
-    public static final int MOTOR_TWO = 0;
-    public static final double kS = 0.1;
-    public static final double kV = 0.1;
+    public static final int MOTOR_ONE = 4;
+    public static final int MOTOR_TWO = 5;
+    public static final double kS = 0.0;
+    public static final double kV = 0.002075992;
     public static final double kA = 0.0;
+    public static final double kP = 0.00129;
+    public static final double kI = 0.00409;
+    public static final double kD = 0.0;
+  }
+
+  public static class BeamBreakMap{
+    public static final int MOTOR = 4;
+    public static final int CHANNEL = 9;
   }
 }
   
