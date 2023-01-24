@@ -28,6 +28,8 @@ public abstract class DriverMap extends CommandMap {
 
   abstract JoystickButton getPathPlanningTestButton();
 
+  abstract JoystickButton getAlingmentButton();
+
   abstract double getLeftYAxis();
 
   abstract double getLeftXAxis();
@@ -49,6 +51,7 @@ public abstract class DriverMap extends CommandMap {
     pidMotor.setDefaultCommand(pidMotor.rotateWithJoystickCommand(getLeftXAxis(), -getLeftYAxis()));
 
     swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
+    getAlingmentButton().onTrue(swerve.ChargingStationCommand());
     JoystickMotorRotation joystickMotorRotation = JoystickMotorRotation.getInstance();
     PistonSystemOne instance = PistonSystemOne.getInstance();
     getPistonButton().onTrue(new InstantCommand(() -> instance.shootPiston()));

@@ -1,7 +1,8 @@
 package frc.robot.layout;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.subsystems.PinkArm;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.JoystickTwoMotors;
 import frc.robot.subsystems.TwoMotorOpp;
 import frc.robot.util.controllers.CommandMap;
@@ -26,8 +27,17 @@ public abstract class OperatorMap extends CommandMap {
 
  
 
+  abstract double getLeftYAxis();
+
+  abstract double getRightYAxis();
+
   @Override
-  public void registerCommands() {
+  public void registerCommands(){
+    PinkArm pinkArm = PinkArm.getInstance();
+
+    pinkArm.setDefaultCommand(new RunCommand(() -> pinkArm.PivotOperation(-getLeftYAxis()), pinkArm));
+    pinkArm.setDefaultCommand(new RunCommand(() -> pinkArm.TelescopeOperation(-getRightYAxis()), pinkArm));
+
     JoystickTwoMotors joystickTwoMotors = JoystickTwoMotors.getInstance();
     joystickTwoMotors.setDefaultCommand(new RunCommand(() -> joystickTwoMotors.rotateMotor(getLeftXAxis())));
 
