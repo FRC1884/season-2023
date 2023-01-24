@@ -14,12 +14,12 @@ import frc.robot.util.SwerveModuleConstants;
 public class RobotMap {
 
   public static final class DriveMap {
-    public static final int PIGEON_ID = 0;
+    public static final int PIGEON_ID = 1;
     public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
 
     public static final COTSFalconSwerveConstants
         MODULE_TYPE = // TODO: This must be tuned to specific robot
-        COTSFalconSwerveConstants.SDSMK4(COTSFalconSwerveConstants.DriveGearRatios.SDSMK4_L1);
+        COTSFalconSwerveConstants.SDSMK3(COTSFalconSwerveConstants.DriveGearRatios.SDSMK3_STANDARD);
 
     /* Drivetrain Constants */
     public static final double TRACK_WIDTH =
@@ -27,12 +27,6 @@ public class RobotMap {
     public static final double WHEEL_BASE =
         Units.inchesToMeters(21.73); // TODO: This must be tuned to specific robot
     public static final double WHEEL_CIRCUMFERENCE = MODULE_TYPE.wheelCircumference;
-
-    /* PixyCam Constants */
-    public static final double PIXYCAM_ROTATION_IN_DEGREES = 0.002 * 0.2; //TODO: Tune constant
-    public static final double PIXYCAM_RESOLUTION = 320;
-    public static final double PIXYCAM_PID_POSITION_TOLERANCE = 2;
-    public static final double PIXYCAM_PID_VELOCITY_TOLERANCE = 50;
 
     /*
      * Swerve Kinematics
@@ -83,7 +77,7 @@ public class RobotMap {
     public static final double ROTATOR_KF = MODULE_TYPE.angleKF;
 
     /* Drive Motor PID Values */
-    public static final double DRIVE_KP = 1; // TODO: This must be tuned to specific robot
+    public static final double DRIVE_KP = 0.05; // TODO: This must be tuned to specific robot
     public static final double DRIVE_KI = 0.0;
     public static final double DRIVE_KD = 0.0;
     public static final double DRIVE_KF = 0.0;
@@ -98,7 +92,7 @@ public class RobotMap {
 
     /* Swerve Profiling Values */
     /** Meters per Second */
-    public static final double MAX_VELOCITY = 4.5; // TODO: This must be tuned to specific robot
+    public static final double MAX_VELOCITY = 3.5; // TODO: This must be tuned to specific robot
     /** Radians per Second */
     public static final double MAX_ANGULAR_VELOCITY =
         10.0; // TODO: This must be tuned to specific robot
@@ -110,20 +104,20 @@ public class RobotMap {
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */
     public static final class FrontLeft { // TODO: This must be tuned to specific robot
-      public static final int DRIVE_ID = 3;
-      public static final int ROTATOR_ID = 4;
-      public static final int ENCODER_ID = 13;
-      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(290.0 + 90);
+      public static final int DRIVE_ID = 1;
+      public static final int ROTATOR_ID = 2;
+      public static final int ENCODER_ID = 1;
+      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(0.0);
       public static final SwerveModuleConstants CONSTANTS =
           new SwerveModuleConstants(DRIVE_ID, ROTATOR_ID, ENCODER_ID, OFFSET);
     }
 
     /* Front Right Module - Module 1 */
     public static final class FrontRight { // TODO: This must be tuned to specific robot
-      public static final int DRIVE_ID = 1;
-      public static final int ROTATOR_ID = 2;
-      public static final int ENCODER_ID = 10;
-      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(144 + 90);
+      public static final int DRIVE_ID = 3;
+      public static final int ROTATOR_ID = 4;
+      public static final int ENCODER_ID = 2;
+      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(0.0);
       public static final SwerveModuleConstants CONSTANTS =
           new SwerveModuleConstants(DRIVE_ID, ROTATOR_ID, ENCODER_ID, OFFSET);
     }
@@ -132,8 +126,8 @@ public class RobotMap {
     public static final class BackLeft { // TODO: This must be tuned to specific robot
       public static final int DRIVE_ID = 5;
       public static final int ROTATOR_ID = 6;
-      public static final int ENCODER_ID = 11;
-      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(225.0 + 90);
+      public static final int ENCODER_ID = 3;
+      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(0.0);
       public static final SwerveModuleConstants CONSTANTS =
           new SwerveModuleConstants(DRIVE_ID, ROTATOR_ID, ENCODER_ID, OFFSET);
     }
@@ -142,8 +136,8 @@ public class RobotMap {
     public static final class BackRight { // TODO: This must be tuned to specific robot
       public static final int DRIVE_ID = 7;
       public static final int ROTATOR_ID = 8;
-      public static final int ENCODER_ID = 12;
-      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(330.0 + 90);
+      public static final int ENCODER_ID = 4;
+      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(0.0);
       public static final SwerveModuleConstants CONSTANTS =
           new SwerveModuleConstants(DRIVE_ID, ROTATOR_ID, ENCODER_ID, OFFSET);
     }
@@ -189,4 +183,34 @@ public class RobotMap {
     public static final int OPERATOR_JOYSTICK = 1;
     public static final double STICK_DEADBAND = 0.1;
   }
+
+  public static class PistonMap {
+    //temporary values
+    public static final int FORWARD_CHANNEL = 0;
+    public static final int REVERSE_CHANNEL = 0;
+  }
+
+  public static class MotorMap {
+    public static final double FORWARD_SPEED = 1.0;
+    public static final double REVERSE_SPEED = -1.0;
+    public static final double OFF_SPEED = 0.0;
+    public static final int MOTOR = -1;
+  }
+
+  public static class TwoMotorMap
+  {
+    public static final int MOTOR_ONE = 15;
+    public static final int MOTOR_TWO = 16;
+    public static final int MOTOR_THREE = 17;
+  }
+  
+  public static class TwoMotorOppMap
+  {
+    public static final int MOTOR_ONE = 0;
+    public static final int MOTOR_TWO = 0;
+    public static final double kS = 0.1;
+    public static final double kV = 0.1;
+    public static final double kA = 0.0;
+  }
 }
+  

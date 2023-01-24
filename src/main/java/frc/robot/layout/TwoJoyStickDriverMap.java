@@ -15,13 +15,18 @@ public class TwoJoyStickDriverMap extends DriverMap {
   }
 
   @Override
+  public JoystickButton getPistonButton(){
+    return controller.getButton(Button.BUTTON_A);
+  }
+
+  @Override
   public ChassisSpeeds getChassisSpeeds() {
-    var x = controller.getAxis(Axis.AXIS_LEFT_X) * RobotMap.DriveMap.MAX_VELOCITY * 0.1;
-    var y = controller.getAxis(Axis.AXIS_LEFT_Y) * RobotMap.DriveMap.MAX_VELOCITY * 0.1;
+    var y = controller.getAxis(Axis.AXIS_LEFT_X) * RobotMap.DriveMap.MAX_VELOCITY * 0.1;
+    var x = controller.getAxis(Axis.AXIS_LEFT_Y) * RobotMap.DriveMap.MAX_VELOCITY * 0.1;
     var rot = controller.getAxis(Axis.AXIS_RIGHT_X) * RobotMap.DriveMap.MAX_ANGULAR_VELOCITY * 0.1;
 
     var swerve = Swerve.getInstance();
-    return ChassisSpeeds.fromFieldRelativeSpeeds(-y, -x, -rot, swerve.getYaw());
+    return ChassisSpeeds.fromFieldRelativeSpeeds(-x, -y, -rot, swerve.getYaw());
   }
 
   @Override
@@ -29,13 +34,36 @@ public class TwoJoyStickDriverMap extends DriverMap {
     return controller.getButton(Button.BUTTON_X);
   }
 
+  @Override 
+  public JoystickButton getAlingmentButton() {
+    return controller.getButton(Button.BUTTON_Y);
+
   @Override
+  public double getLeftYAxis() {
+    return controller.getAxis(Axis.AXIS_LEFT_Y);
+  }
+  @Override
+  public double getLeftXAxis()
+  {
+      return controller.getAxis(Axis.AXIS_LEFT_X);
+  }
+  /* public JoystickButton getJoystickButton(){
+    return controller.getButton(Button.BUTTON_A);
+  } */
+  public JoystickButton getNinetyButton(){
+    return controller.getButton(Button.BUTTON_A);
+  }
   public JoystickButton getPixyCamDistanceButton() {
     return controller.getButton(Button.BUTTON_B);
+   }
   }
+
 
   @Override
   public void registerCommands() {
     super.registerCommands();
   }
+
+
+
 }
