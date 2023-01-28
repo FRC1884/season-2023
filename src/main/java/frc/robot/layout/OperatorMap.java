@@ -2,6 +2,7 @@ package frc.robot.layout;
 
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.subsystems.PinkArm;
+import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.JoystickTwoMotors;
 import frc.robot.subsystems.TwoMotorOpp;
@@ -25,7 +26,7 @@ public abstract class OperatorMap extends CommandMap {
 
   public abstract JoystickButton getTwoMotorButton(); 
 
- 
+  public abstract JoystickButton getIntakeButton();
 
   abstract double getLeftYAxis();
 
@@ -33,6 +34,8 @@ public abstract class OperatorMap extends CommandMap {
 
   @Override
   public void registerCommands(){
+    Intake intake = Intake.getInstance();
+    getIntakeButton().onTrue(intake.IntakeOpenCommand());
     PinkArm pinkArm = PinkArm.getInstance();
 
     pinkArm.setDefaultCommand(new RunCommand(() -> pinkArm.PivotOperation(-getLeftYAxis()), pinkArm));
