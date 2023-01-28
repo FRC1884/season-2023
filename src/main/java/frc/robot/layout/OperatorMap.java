@@ -23,16 +23,20 @@ public abstract class OperatorMap extends CommandMap {
 
   public abstract double getLeftXAxis();
 
-  public abstract JoystickButton getTwoMotorButton(); 
-
- 
+  public abstract JoystickButton getTwoMotorButton();
+  
+  public abstract double getElevatorSpeed();
 
   abstract double getLeftYAxis();
 
   abstract double getRightYAxis();
 
   @Override
-  public void registerCommands(){
+  public void registerCommands() {
+    var twoMotors = JoystickTwoMotors.getInstance();
+
+    twoMotors.setDefaultCommand(new RunCommand(() -> twoMotors.rotateMotor(getElevatorSpeed())));
+    /*
     PinkArm pinkArm = PinkArm.getInstance();
 
     pinkArm.setDefaultCommand(new RunCommand(() -> pinkArm.PivotOperation(-getLeftYAxis()), pinkArm));
@@ -42,6 +46,6 @@ public abstract class OperatorMap extends CommandMap {
     joystickTwoMotors.setDefaultCommand(new RunCommand(() -> joystickTwoMotors.rotateMotor(getLeftXAxis())));
 
     TwoMotorOpp twoMotorOpp = TwoMotorOpp.getInstance();
-    getTwoMotorButton().onTrue(new InstantCommand(() -> twoMotorOpp.rotateMotor(), twoMotorOpp));
+    getTwoMotorButton().onTrue(new InstantCommand(() -> twoMotorOpp.rotateMotor(), twoMotorOpp));*/
   }
 }

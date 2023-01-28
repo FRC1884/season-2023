@@ -52,7 +52,7 @@ public class Swerve extends SubsystemBase {
     gyro.configFactoryDefault();
     zeroGyro();
 
-    vision = new Vision();
+    vision = Vision.getInstance();
 
     modules =
         new SwerveModule[] {
