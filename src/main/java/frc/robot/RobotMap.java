@@ -220,5 +220,15 @@ public class RobotMap {
     public static final int MOTOR = 4;
     public static final int CHANNEL = 9;
   }
+
+  public static class IntakeMap{
+    public static final int MOTOR = -1;
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.1;
+    public static final double OPENANGLE = 100;
+    public static final double CLOSEANGLE = 10;
+    public static final double BUFFER = 5;
+  }
 }
   
