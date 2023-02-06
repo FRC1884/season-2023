@@ -21,7 +21,7 @@ public class TwoJoyStickDriverMap extends DriverMap {
     var rot = controller.getAxis(Axis.AXIS_RIGHT_X) * RobotMap.DriveMap.MAX_ANGULAR_VELOCITY * 0.1;
 
     var swerve = Swerve.getInstance();
-    return ChassisSpeeds.fromFieldRelativeSpeeds(-x, -y, -rot, swerve.getYaw());
+    return ChassisSpeeds.fromFieldRelativeSpeeds(-y, -x, -rot, swerve.getYaw());
   }
 
   @Override
@@ -29,6 +29,20 @@ public class TwoJoyStickDriverMap extends DriverMap {
     return controller.getButton(Button.BUTTON_X);
   }
 
+  @Override
+  public JoystickButton getPixyCamDistanceButton() {
+    return controller.getButton(Button.BUTTON_B);
+  }
+
+  @Override 
+  public JoystickButton getAlingmentButton() {
+    return controller.getButton(Button.BUTTON_Y);
+  }
+
+  @Override
+  public JoystickButton getAprilTagAlignmentButton() {
+    return controller.getButton(Button.BUTTON_A);
+  }
   @Override
   public void registerCommands() {
     super.registerCommands();
