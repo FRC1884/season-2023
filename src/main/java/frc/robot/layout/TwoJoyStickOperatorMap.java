@@ -43,12 +43,12 @@ public class TwoJoyStickOperatorMap extends OperatorMap {
     }
 
     @Override
-    double getLeftYAxis() {
+    public double getLeftYAxis() {
         return controller.getAxis(Axis.AXIS_LEFT_Y);
     }
 
     @Override
-    double getRightYAxis() {
+    public double getRightYAxis() {
         return controller.getAxis(Axis.AXIS_RIGHT_Y);
     }
 
