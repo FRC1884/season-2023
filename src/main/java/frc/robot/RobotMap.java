@@ -18,7 +18,7 @@ public class RobotMap {
     public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
 
     public static final COTSFalconSwerveConstants MODULE_TYPE = // TODO: This must be tuned to specific robot
-        COTSFalconSwerveConstants.SDSMK4(COTSFalconSwerveConstants.DriveGearRatios.SDSMK4_L1);
+        COTSFalconSwerveConstants.SDSMK4(COTSFalconSwerveConstants.DriveGearRatios.SDSMK4_L3);
 
     /* Drivetrain Constants */
     public static final double TRACK_WIDTH = Units.inchesToMeters(21.73); // TODO: This must be tuned to specific robot
@@ -41,7 +41,6 @@ public class RobotMap {
     public static final double YPID_VELOCITY_TOLERANCE = 1;
     public static final double THETAPID_POSITION_TOLERANCE = 5;
     public static final double THETAPID_VELOCITY_TOLERANCE = 1;
-
     /*
      * Swerve Kinematics
      * No need to ever change this unless you are not doing a traditional
@@ -187,6 +186,19 @@ public class RobotMap {
     public static final double FIELD_WIDTH = Units.inchesToMeters(27);
   }
 
+  public static class PinkMap{
+    public static final int PIVOT_PORT = 0;
+    public static final int TELESCOPE_PORT = 0;
+    public static final int PIVOT_RATIO = 100;
+    public static final double PIVOT_MIN = 0;
+    public static final double PIVOT_MAX = .75;
+    public static final int TELESCOPE_RATIO = 40;
+    public static final double TELESCOPE_MIN = 0;//assuming it starts as spooled as possible
+    public static final double TELESCOPE_MAX = 4;//should be in terms of rotations of the larger gear
+
+
+  }
+
   public static class ControllerMap {
     public static final int DRIVER_JOYSTICK = 0;
     public static final int OPERATOR_JOYSTICK = 1;
@@ -208,4 +220,45 @@ public class RobotMap {
 
   }
 
+  public static class MotorMap {
+    public static final double FORWARD_SPEED = 1.0;
+    public static final double REVERSE_SPEED = -1.0;
+    public static final double OFF_SPEED = 0.0;
+    public static final int MOTOR = -1;
+  }
+
+  public static class TwoMotorMap
+  {
+    public static final int MOTOR_ONE = 15;
+    public static final int MOTOR_TWO = 16;
+    public static final int MOTOR_THREE = 17;
+  }
+  
+  public static class TwoMotorOppMap
+  {
+    public static final int MOTOR_ONE = 4;
+    public static final int MOTOR_TWO = 5;
+    public static final double kS = 0.0;
+    public static final double kV = 0.002075992;
+    public static final double kA = 0.0;
+    public static final double kP = 0.00129;
+    public static final double kI = 0.00409;
+    public static final double kD = 0.0;
+  }
+
+  public static class BeamBreakMap{
+    public static final int MOTOR = 4;
+    public static final int CHANNEL = 9;
+  }
+
+  public static class IntakeMap{
+    public static final int MOTOR = -1;
+    public static final double kP = 0.1;
+    public static final double kI = 0.0;
+    public static final double kD = 0.1;
+    public static final double OPENANGLE = 100;
+    public static final double CLOSEANGLE = 10;
+    public static final double BUFFER = 5;
+  }
 }
+  

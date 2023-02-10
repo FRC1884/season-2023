@@ -119,6 +119,9 @@ public class Vision extends SubsystemBase {
       return true;
     }
     return false;
+    var camList = new ArrayList<Pair<PhotonCamera, Transform3d>>();
+    camList.add(new Pair<PhotonCamera, Transform3d>(vision, RobotMap.CameraMap.ROBOT_TO_CAM));
+    robotPoseEstimator = new RobotPoseEstimator(atfl, PoseStrategy.AVERAGE_BEST_TARGETS, camList); //TODO Test different poses
   }
 
   public PhotonPoseEstimator getPoseEstimator(CameraNumber camNum) {
@@ -181,5 +184,4 @@ public class Vision extends SubsystemBase {
     poseEstimator.setReferencePose(prevEstimatedRobotPose);
     return poseEstimator.update();
   }
-
 }

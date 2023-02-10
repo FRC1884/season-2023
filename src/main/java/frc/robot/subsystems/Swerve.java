@@ -9,7 +9,6 @@ import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -45,7 +44,6 @@ import frc.robot.RobotMap;
 import frc.robot.RobotMap.ChargingStationMap;
 import frc.robot.RobotMap.DriveMap;
 import frc.robot.util.SwerveModule;
-import pixy2api.Pixy2CCC.Block;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Vision.CameraNumber;
 
@@ -65,8 +63,7 @@ public class Swerve extends SubsystemBase {
   private static Swerve instance;
 
   public static Swerve getInstance() {
-    if (instance == null)
-      instance = new Swerve();
+    if (instance == null) instance = new Swerve();
     return instance;
   }
 
@@ -233,30 +230,8 @@ public class Swerve extends SubsystemBase {
                 0.5*yPID.calculate(poseEstimator.getEstimatedPosition().getY(), offset.getY()+ poseEstimator.getEstimatedPosition().getY()),
                   0.2*thetaPID.calculate(offset.getRotation().getRadians(), Math.PI),
                   getYaw());
-<<<<<<< HEAD
             
             drive(newSpeed, true, yaw);
-=======
-            ChassisSpeeds godSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(
-                    0,
-                    0,
-                    thetaPID.calculate(offset.getRotation().getRadians(), Math.PI),
-                      getYaw());
-            if(godSpeed.omegaRadiansPerSecond > 2){
-              godSpeed.omegaRadiansPerSecond = 2;
-            }
-            else if(godSpeed.omegaRadiansPerSecond < -2){
-              godSpeed.omegaRadiansPerSecond = -2;
-            }
-            else if(godSpeed.omegaRadiansPerSecond >-1 && godSpeed.omegaRadiansPerSecond < 0){
-              godSpeed.omegaRadiansPerSecond = -1;
-            }
-            else if(godSpeed.omegaRadiansPerSecond < 1 && godSpeed.omegaRadiansPerSecond > 0){
-              godSpeed.omegaRadiansPerSecond = 1;
-            }
-            System.out.println(godSpeed.omegaRadiansPerSecond);
-            drive(godSpeed, true);
->>>>>>> 7814f70982d24470ba3b0b37e5557ff827ce9563
           },
           interrupted -> {
             ChassisSpeeds endSpeed = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -373,6 +348,10 @@ public class Swerve extends SubsystemBase {
 
   }
 
+    return new RepeatCommand(new RunCommand(() -> this.drive(chassisSpeeds.get(), true)));
+  }
+
+  
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveMap.MAX_VELOCITY);
@@ -599,5 +578,60 @@ public class Swerve extends SubsystemBase {
     // System.out.println("Roll: " + gyro.getRoll()+"\n ");
     //System.out.println("Yaw: " + gyro.getYaw()+"\n ");
    }
+  }
 
+
+ public SequentialCommandGroup ChargingStationCommand(){
+    final ChassisSpeeds initialChassisSpeeds = new ChassisSpeeds(0.05, 0, 0); 
+    final ChassisSpeeds finalChassisSpeeds = new ChassisSpeeds(-0.5, 0, 0); 
+    final Rotation2d initialPosition = modules[0].getCanCoder();
+    
+    return new SequentialCommandGroup(
+      new FunctionalCommand(
+      () -> {
+        
+      },
+      () -> { 
+        this.drive(initialChassisSpeeds, true);
+      },
+      interrupted -> {
+        
+      },
+      () -> {
+        if(gyro.getPitch() == 0){
+          return true;
+        }
+        else{
+          return false;
+        }
+      },
+      this
+    ),
+
+    new FunctionalCommand(
+      () -> {
+        
+      },
+      () -> {
+        this.drive(finalChassisSpeeds, true);
+      },
+      interrupted -> {
+
+      }, 
+      () -> {
+        if(modules[0].getCanCoder() == initialPosition)
+        {
+          return true;
+        }
+        else{
+          return false;
+        }
+      },
+      this
+    )
+    );
+
+    
+  }
 }
+
