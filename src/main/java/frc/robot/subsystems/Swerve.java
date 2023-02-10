@@ -90,7 +90,7 @@ public class Swerve extends SubsystemBase {
     gyro.configFactoryDefault();
     zeroGyro();
 
-    //vision = Vision.getInstance();
+    vision = Vision.getInstance();
     pixyCam = PixyCam.getInstance();
 
     modules = new SwerveModule[] {
@@ -209,8 +209,7 @@ public class Swerve extends SubsystemBase {
       PIDController yPID = new PIDController(RobotMap.DriveMap.DRIVE_KP, RobotMap.DriveMap.DRIVE_KI,
           RobotMap.DriveMap.DRIVE_KD); 
       yPID.setTolerance(RobotMap.DriveMap.YPID_POSITION_TOLERANCE, RobotMap.DriveMap.YPID_VELOCITY_TOLERANCE);
-      PIDController thetaPID = new PIDController(DriveMap.ROTATOR_KP, DriveMap.ROTATOR_KI,
-          DriveMap.ROTATOR_KD); 
+      PIDController thetaPID = new PIDController(5, 0, 0); 
       thetaPID.setTolerance(DriveMap.THETAPID_POSITION_TOLERANCE, DriveMap.THETAPID_VELOCITY_TOLERANCE);
       Rotation2d yaw = this.getYaw();
       
@@ -234,8 +233,30 @@ public class Swerve extends SubsystemBase {
                 0.5*yPID.calculate(poseEstimator.getEstimatedPosition().getY(), offset.getY()+ poseEstimator.getEstimatedPosition().getY()),
                   0.2*thetaPID.calculate(offset.getRotation().getRadians(), Math.PI),
                   getYaw());
+<<<<<<< HEAD
             
             drive(newSpeed, true, yaw);
+=======
+            ChassisSpeeds godSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    0,
+                    0,
+                    thetaPID.calculate(offset.getRotation().getRadians(), Math.PI),
+                      getYaw());
+            if(godSpeed.omegaRadiansPerSecond > 2){
+              godSpeed.omegaRadiansPerSecond = 2;
+            }
+            else if(godSpeed.omegaRadiansPerSecond < -2){
+              godSpeed.omegaRadiansPerSecond = -2;
+            }
+            else if(godSpeed.omegaRadiansPerSecond >-1 && godSpeed.omegaRadiansPerSecond < 0){
+              godSpeed.omegaRadiansPerSecond = -1;
+            }
+            else if(godSpeed.omegaRadiansPerSecond < 1 && godSpeed.omegaRadiansPerSecond > 0){
+              godSpeed.omegaRadiansPerSecond = 1;
+            }
+            System.out.println(godSpeed.omegaRadiansPerSecond);
+            drive(godSpeed, true);
+>>>>>>> 7814f70982d24470ba3b0b37e5557ff827ce9563
           },
           interrupted -> {
             ChassisSpeeds endSpeed = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -245,9 +266,13 @@ public class Swerve extends SubsystemBase {
             if (xPID.atSetpoint() && yPID.atSetpoint() && thetaPID.atSetpoint()) {
               return true;
             }
+            if(thetaPID.atSetpoint()){
+              System.out.println("AT SETPOINT");
+              
+            }
             
             for(PhotonTrackedTarget target : vision.getLastTargetsList()){
-              System.out.println(target);
+              //System.out.println(target);
               if(!(target == null)){
                 return false;
               }
