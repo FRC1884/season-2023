@@ -1,6 +1,14 @@
 package frc.robot.layout;
 
+import java.util.HashMap;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -40,11 +48,22 @@ public abstract class DriverMap extends CommandMap {
   
   abstract JoystickButton getPixyCamDistanceButton();
 
+  abstract JoystickButton getAlingmentButton();
+
+  abstract JoystickButton getAprilTagAlignmentButton();
+
   public abstract JoystickButton getTwoMotorButton();
 
   @Override
   public void registerCommands() {
     var swerve = Swerve.getInstance();
+    PistonSystemOne instance = PistonSystemOne.getInstance();
+    
+    getPistonButton().onTrue(new InstantCommand(() -> instance.shootPiston()));
+    HashMap<String, Command> oneMeterEventMap = new HashMap<String, Command>();
+    oneMeterEventMap.put("I mean it's alright like", new PrintCommand("I'm here"));
+    oneMeterEventMap.put("finishedPath", new PrintCommand("This works"));
+    
     PIDMotor pidMotor = PIDMotor.getInstance();
     getNinetyButton().onTrue(pidMotor.rotateToNinetyCommand());
 
@@ -59,13 +78,15 @@ public abstract class DriverMap extends CommandMap {
     // JoystickMotorRotation joystickMotorRotation = JoystickMotorRotation.getInstance();
     // swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
 
+    getAlingmentButton().onTrue(swerve.chargingStationCommand());
+
+    getPathPlanningTestButton().onTrue(swerve.chargingStationPPAndBalance(oneMeterEventMap));
+
+    getAprilTagAlignmentButton().onTrue(swerve.alignWithAprilTag(true));
+
     // pixyCam.setDefaultCommand(pixyCam.printCommand());
-    
-    // getPixyCamDistanceButton().onTrue(swerve.AlignWithGameObject());
-    //joystickMotorRotation.setDefaultCommand(new RunCommand(() -> joystickMotorRotation.rotateMotor(getLeftYAxis()), joystickMotorRotation));
-    //TwoMotorOpp twoMotorOpp = TwoMotorOpp.getInstance();
-    //getTwoMotorButton().onTrue(new InstantCommand(() -> twoMotorOpp.rotateMotor(), twoMotorOpp));
-    //getTwoMotorButton().onFalse(new InstantCommand(() -> twoMotorOpp.stopMotor(), twoMotorOpp));
+
+    getPixyCamDistanceButton().onTrue(swerve.alignWithGameObject());
     BeamBreakMotors beamBreakMotors = BeamBreakMotors.getInstance();
     beamBreakMotors.setDefaultCommand(new RunCommand(() -> beamBreakMotors.activateMotor(), beamBreakMotors));
   }

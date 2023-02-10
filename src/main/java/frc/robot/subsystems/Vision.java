@@ -14,15 +14,18 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap;
+
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.photonvision.RobotPoseEstimator;
-import org.photonvision.RobotPoseEstimator.PoseStrategy;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 public class Vision extends SubsystemBase {
 
@@ -35,25 +38,32 @@ public class Vision extends SubsystemBase {
   }
 
   // Camera
-  private PhotonCamera vision;
+  private PhotonCamera cam, cam2;
 
   // Robot Pose Estimator
-  private RobotPoseEstimator robotPoseEstimator;
+  private PhotonPoseEstimator robotPoseEstimator, robotPoseEstimator2;
 
+  public enum CameraNumber {
+    FIRST_CAM,
+    SECOND_CAM;
+  }
+
+  CameraNumber cameraNumber;
   // Target information
   private PhotonTrackedTarget latestTarget;
+  private ArrayList<PhotonTrackedTarget> lastTargetsList = new ArrayList<PhotonTrackedTarget>();
+  private Transform3d latestTransform;
 
   // AprilTagFieldLayout
   AprilTagFieldLayout atfl;
 
   private Vision() {
-
     // SETTING UP APRILTAGS
 
     // Tags 4 and 5 is at Double Substations
     // Tags 1, 2, and 3 is red alliance
     // Tags, 6, 7, and 8 is blue alliance
-    Path aprilTags = Filesystem.getDeployDirectory().toPath().resolve("AprilTags.json");
+    Path aprilTags = Filesystem.getDeployDirectory().toPath().resolve("AprilTags/AprilTags.json");
     try {
       atfl = new AprilTagFieldLayout(aprilTags);
     } catch (IOException e) {
@@ -78,16 +88,51 @@ public class Vision extends SubsystemBase {
      * Choose the Pose which is the average of all the poses from each tag.
      */
     // SETTING UP CAMERAS
-    vision = new PhotonCamera(COMPUTER_VISION);
+    // vision = new PhotonCamera(CAMERA_ONE);
+    cam2 = new PhotonCamera(CAMERA_TWO);
 
+    // robotPoseEstimator = new PhotonPoseEstimator(atfl,
+    // PoseStrategy.LOWEST_AMBIGUITY, vision, RobotMap.CameraMap.ROBOT_TO_CAM);
+    robotPoseEstimator2 = new PhotonPoseEstimator(atfl, PoseStrategy.LOWEST_AMBIGUITY, cam2,
+        RobotMap.CameraMap.ROBOT_TO_CAM_TWO); //                                              
+                                                                                                                                            
+  }
+
+  public void updateResult() {
+    if(lastTargetsList.size() == 20){
+      lastTargetsList.remove(0);
+    }
+    if (cam2.getLatestResult().hasTargets()){
+      latestTarget = cam2.getLatestResult().getBestTarget();
+      latestTransform = latestTarget.getBestCameraToTarget();
+      lastTargetsList.add(latestTarget);
+    }
+    else{
+      lastTargetsList.add(null);
+    }
+  }
+
+  public boolean updateResult(int i){
+    if (cam2.getLatestResult().hasTargets()){
+      latestTarget = cam2.getLatestResult().getBestTarget();
+      latestTransform = latestTarget.getBestCameraToTarget();
+      return true;
+    }
+    return false;
     var camList = new ArrayList<Pair<PhotonCamera, Transform3d>>();
     camList.add(new Pair<PhotonCamera, Transform3d>(vision, RobotMap.CameraMap.ROBOT_TO_CAM));
     robotPoseEstimator = new RobotPoseEstimator(atfl, PoseStrategy.AVERAGE_BEST_TARGETS, camList); //TODO Test different poses
   }
 
-  private void updateResult() {
-    if (vision.getLatestResult().hasTargets())
-      latestTarget = vision.getLatestResult().getBestTarget();
+  public PhotonPoseEstimator getPoseEstimator(CameraNumber camNum) {
+    switch (camNum) {
+      case FIRST_CAM:
+        return robotPoseEstimator;
+      case SECOND_CAM:
+        return robotPoseEstimator2;
+      default:
+        return robotPoseEstimator;
+    }
   }
 
   /*
@@ -96,8 +141,16 @@ public class Vision extends SubsystemBase {
    * the drivetrain to be directly in line with the face of the
    * april tag (only have it look in the direction of the april tag)
    */
-  public double getAngle() {
-    return latestTarget.getYaw();
+  public PhotonTrackedTarget getLatestTarget() {
+    return latestTarget;
+  }
+
+  public Transform3d getLatestPose() {
+    return latestTransform;
+  }
+
+  public ArrayList<PhotonTrackedTarget> getLastTargetsList(){
+    return lastTargetsList;
   }
 
   public double getRange() {
@@ -116,7 +169,7 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    updateResult();
+    // updateResult();
   }
 
   /**
@@ -126,16 +179,9 @@ public class Vision extends SubsystemBase {
    *         of the observation. Assumes a planar field and the robot is always
    *         firmly on the ground
    */
-  public Pair<Pose2d, Double> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-    robotPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-
-    double currentTime = Timer.getFPGATimestamp();
-    Optional<Pair<Pose3d, Double>> result = robotPoseEstimator.update();
-    if (result.isPresent()) {
-      return new Pair<Pose2d, Double>(
-          result.get().getFirst().toPose2d(), currentTime - result.get().getSecond());
-    } else {
-      return new Pair<Pose2d, Double>(null, 0.0);
-    }
+  public Optional<EstimatedRobotPose> getEstimatedRobotPose(Pose2d prevEstimatedRobotPose,
+      PhotonPoseEstimator poseEstimator) {
+    poseEstimator.setReferencePose(prevEstimatedRobotPose);
+    return poseEstimator.update();
   }
 }
