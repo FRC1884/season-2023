@@ -56,6 +56,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.lang.model.util.ElementScanner6;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -75,7 +77,10 @@ public class Swerve extends SubsystemBase {
   // Camera
   Vision vision;
   private PixyCam pixyCam;
+
+  //PID Controllers
   PIDController speedController = new PIDController(0.0001, 0, 0);
+  PIDController compensatePID = new PIDController(DriveMap.DRIVE_KP, DriveMap.DRIVE_KI, DriveMap.DRIVE_KD);
 
   // Swerve Pose Estimator
   private SwerveDrivePoseEstimator poseEstimator;
@@ -97,19 +102,28 @@ public class Swerve extends SubsystemBase {
 
     odometry = new SwerveDriveOdometry(DriveMap.KINEMATICS, getYaw(), getModulePositions());
     poseEstimator = new SwerveDrivePoseEstimator(DriveMap.KINEMATICS, getYaw(), getModulePositions(), getPose());
+
+    compensatePID.setTolerance(5);
   }
 
-  public void drive(ChassisSpeeds speeds, boolean isOpenLoop) {
-    SwerveModuleState[] swerveModuleStates = DriveMap.KINEMATICS.toSwerveModuleStates(speeds);
+  public void drive(ChassisSpeeds speeds, boolean isOpenLoop, Rotation2d initialYaw) {
+    ChassisSpeeds driftSpeeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+    //Rotation2d initialYaw = this.getYaw();
+    if (Math.abs(speeds.omegaRadiansPerSecond) < 0.01)
+      driftSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, (int) (compensatePID.calculate(initialYaw.getDegrees() - this.getYaw().getDegrees())), this.getYaw());
+    SwerveModuleState[] swerveModuleStates = DriveMap.KINEMATICS.toSwerveModuleStates(driftSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveMap.MAX_VELOCITY);
 
     for (SwerveModule mod : modules) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
+
+ 
   }
 
   public Command driveCommand(Supplier<ChassisSpeeds> chassisSpeeds) {
-    return new RepeatCommand(new RunCommand(() -> this.drive(chassisSpeeds.get(), true), this));
+    Rotation2d yaw = this.getYaw();
+    return new RepeatCommand(new RunCommand(() -> this.drive(chassisSpeeds.get(), true, yaw), this));
   }
 
   private List<Boolean> lastTenFrames = new ArrayList<>();
@@ -119,7 +133,7 @@ public class Swerve extends SubsystemBase {
     //TODO: Please set tolerances for pixyPID
         
     ChassisSpeeds targetSwerveSpeeds = new ChassisSpeeds();
-      
+    Rotation2d yaw = this.getYaw();
 
     return new FunctionalCommand( //TODO: YIFEI PLEASE FIX
         () -> {
@@ -168,13 +182,13 @@ public class Swerve extends SubsystemBase {
           
           // LOOP PART OF COMMAND (RUN ONCE PER FRAME)
           targetSwerveSpeeds.omegaRadiansPerSecond = Math.toRadians(pixyPID.calculate(gyro.getYaw(),pixyCam.getTargetObjectRotation()));
-          drive(targetSwerveSpeeds, true);
+          drive(targetSwerveSpeeds, true, yaw);
         },
         interrupted -> {
           System.out.println("End");
           System.out.println(interrupted); // COMMAND IS BEING INTERRUPTED IMMEDIATELY!! this needs to be fixed could be taking too long?
           ChassisSpeeds endSpeed = new ChassisSpeeds(0.0, 0.0, 0.0);
-          drive(endSpeed, true);
+          drive(endSpeed, true, yaw);
         },
         () -> {
           // IS COMMAND FINISHED?
@@ -198,7 +212,7 @@ public class Swerve extends SubsystemBase {
       PIDController thetaPID = new PIDController(DriveMap.ROTATOR_KP, DriveMap.ROTATOR_KI,
           DriveMap.ROTATOR_KD); 
       thetaPID.setTolerance(DriveMap.THETAPID_POSITION_TOLERANCE, DriveMap.THETAPID_VELOCITY_TOLERANCE);
-      
+      Rotation2d yaw = this.getYaw();
       
       return new FunctionalCommand(
           () -> {
@@ -221,11 +235,11 @@ public class Swerve extends SubsystemBase {
                   0.2*thetaPID.calculate(offset.getRotation().getRadians(), Math.PI),
                   getYaw());
             
-            drive(newSpeed, true);
+            drive(newSpeed, true, yaw);
           },
           interrupted -> {
             ChassisSpeeds endSpeed = new ChassisSpeeds(0.0, 0.0, 0.0);
-            drive(endSpeed, true);
+            drive(endSpeed, true, yaw);
           },
           () -> {
             if (xPID.atSetpoint() && yPID.atSetpoint() && thetaPID.atSetpoint()) {
@@ -380,6 +394,7 @@ public class Swerve extends SubsystemBase {
 
   public Command compensateDrift(double yawGoal) {
     PIDController compensatePID = new PIDController(DriveMap.DRIVE_KP, DriveMap.DRIVE_KI, DriveMap.DRIVE_KD);
+    Rotation2d yaw = this.getYaw();
 
     return new FunctionalCommand(
         () -> { // init
@@ -387,7 +402,7 @@ public class Swerve extends SubsystemBase {
       },
         () -> {  // execute
           this.drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0,
-              (int) (compensatePID.calculate(yawGoal - this.getYaw().getDegrees())), this.getYaw()), false);
+              (int) (compensatePID.calculate(yawGoal - this.getYaw().getDegrees())), this.getYaw()), false, yaw);
           
       },
         (interrupted) -> {  // end
@@ -422,6 +437,8 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putData("x-input PID Controller", xPID);
     SmartDashboard.putData("y-input PID Controller", yPID);
     SmartDashboard.putData("rot PID Controller", thetaPID);
+    
+    Rotation2d yaw = this.getYaw();
 
     return new SequentialCommandGroup(
         new InstantCommand(
@@ -434,7 +451,7 @@ public class Swerve extends SubsystemBase {
               System.out.println("we be reseting");
             }),
         new PPSwerveControllerCommand(
-            traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this)
+            traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true, yaw), this)
             
         // ChargingStationCommand()   //TODO: Remove once you put this command in auto
             );// KEEP IT OPEN LOOP
@@ -446,7 +463,7 @@ public class Swerve extends SubsystemBase {
     // final Rotation2d initialPosition = modules[0].getCanCoder();
     PIDController pid = new PIDController(ChargingStationMap.kP, ChargingStationMap.kI, ChargingStationMap.kD);
     pid.setTolerance(0.5);
-
+    Rotation2d yaw = this.getYaw();
     
     
       return new FunctionalCommand(
@@ -456,11 +473,11 @@ public class Swerve extends SubsystemBase {
         () -> {
           if(pid.calculate(gyro.getRoll()+gyro.getPitch())>ChargingStationMap.MAX_VELOCITY)
           {
-            this.drive(new ChassisSpeeds(ChargingStationMap.MAX_VELOCITY, .0, 0), true);
+            this.drive(new ChassisSpeeds(ChargingStationMap.MAX_VELOCITY, .0, 0), true, yaw);
           }
           else
           {
-            this.drive(new ChassisSpeeds(pid.calculate(gyro.getRoll()+gyro.getPitch(), 0.0), 0, 0), true);
+            this.drive(new ChassisSpeeds(pid.calculate(gyro.getRoll()+gyro.getPitch(), 0.0), 0, 0), true, yaw);
           }
            
         },
@@ -491,6 +508,8 @@ public class Swerve extends SubsystemBase {
     PIDController yPID = new PIDController(5.0, 0.0, 0.0);
     PIDController thetaPID = new PIDController(1.0, 0.0, 0.0);
 
+    Rotation2d yaw = this.getYaw();
+
     return new SequentialCommandGroup(
         new InstantCommand(
             () -> {
@@ -500,7 +519,7 @@ public class Swerve extends SubsystemBase {
                     getYaw(), getModulePositions(), traj.getInitialHolonomicPose());
               }
             }),
-        new PPSwerveControllerCommand(traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this)
+        new PPSwerveControllerCommand(traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true, yaw), this)
         );
   }
 
