@@ -110,7 +110,7 @@ public class RobotMap {
     public static final double MAX_ANGULAR_VELOCITY = 10.0; // TODO: This must be tuned to specific robot
 
     /* Meteres per second squared */
-    public static final double MAX_ACCELERATION = 3; //TODO: TUNE THIS
+    public static final double MAX_ACCELERATION = 3; // TODO: TUNE THIS
 
     /* Neutral Modes */
     public static final NeutralMode ROTATOR_NEUTRAL_MODE = NeutralMode.Coast;
@@ -193,12 +193,29 @@ public class RobotMap {
     public static final double STICK_DEADBAND = 0.1;
   }
 
-  public static class ChargingStationMap
-  {
-    //TODO tune once robot complete
+  public static class ChargingStationMap {
+    // TODO tune once robot complete
     public static final double kP = 0.05;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double MAX_VELOCITY = 2;
+  }
+
+  public static class IntakeMap {
+    public static final int intakePort = -1;
+  }
+
+  public static class FrictionPadMap {
+    public static final int[] piston1Channels = { -1, -1 };
+    public static final int[] piston2Channels = { -1, -1 };
+  }
+
+  public static class ArmMap {
+    public static final int motor1Port = -1;
+    public static final int motor2Port = -1;
+    public static final int topLightPort = -1;
+    public static final int bottomLightPort = -1;
+    public static final int topLimitPort = -1;
+    public static final int bottomLimitPort = -1;
   }
 }

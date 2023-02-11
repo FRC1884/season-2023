@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import frc.robot.RobotMap.IntakeMap;
+
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,7 +18,7 @@ public class Intake extends SubsystemBase {
     return instance;
   }
 
-  private CANSparkMax motor = new CANSparkMax(0, null);
+  private CANSparkMax motor = new CANSparkMax(IntakeMap.intakePort, null);
 
   public Command intakeCommand(double speed) {
     return new InstantCommand(() -> {

@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 
+import frc.robot.RobotMap.ArmMap;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,13 +19,13 @@ public class Arm extends SubsystemBase {
     return instance;
   }
 
-  private CANSparkMax motor1 = new CANSparkMax(0, null);
-  private CANSparkMax motor2 = new CANSparkMax(0, null);
+  private CANSparkMax motor1 = new CANSparkMax(ArmMap.motor1Port, null);
+  private CANSparkMax motor2 = new CANSparkMax(ArmMap.motor2Port, null);
 
-  private DigitalInput topLine = new DigitalInput(0);
-  private DigitalInput topLimit = new DigitalInput(0);
-  private DigitalInput bottomLine = new DigitalInput(0);
-  private DigitalInput bottomLimit = new DigitalInput(0);
+  private DigitalInput topLine = new DigitalInput(ArmMap.topLimitPort);
+  private DigitalInput topLimit = new DigitalInput(ArmMap.topLightPort);
+  private DigitalInput bottomLine = new DigitalInput(ArmMap.bottomLimitPort);
+  private DigitalInput bottomLimit = new DigitalInput(ArmMap.bottomLightPort);
 
   private static void moveMotor(CANSparkMax motor, DigitalInput top, DigitalInput bottom, double speed) {
     if ((speed < 0) && (bottom.get()))

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import frc.robot.RobotMap.FrictionPadMap;
+
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,8 +17,10 @@ public class FrictionPad extends SubsystemBase {
     return instance;
   }
 
-  private DoubleSolenoid piston1 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 0);
-  private DoubleSolenoid piston2 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 0);
+  private DoubleSolenoid piston1 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, FrictionPadMap.piston1Channels[0],
+      FrictionPadMap.piston1Channels[1]);
+  private DoubleSolenoid piston2 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, FrictionPadMap.piston2Channels[0],
+      FrictionPadMap.piston2Channels[1]);
 
   public void togglePistons() {
     piston1.toggle();
