@@ -16,7 +16,7 @@ public class Intake extends SubsystemBase {
     return instance;
   }
 
-  CANSparkMax motor = new CANSparkMax(0, null);
+  private CANSparkMax motor = new CANSparkMax(0, null);
 
   public Command intakeCommand(double speed) {
     return new InstantCommand(() -> {

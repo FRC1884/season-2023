@@ -17,13 +17,13 @@ public class Arm extends SubsystemBase {
     return instance;
   }
 
-  CANSparkMax motor1 = new CANSparkMax(0, null);
-  CANSparkMax motor2 = new CANSparkMax(0, null);
+  private CANSparkMax motor1 = new CANSparkMax(0, null);
+  private CANSparkMax motor2 = new CANSparkMax(0, null);
 
-  DigitalInput topLine = new DigitalInput(0);
-  DigitalInput topLimit = new DigitalInput(0);
-  DigitalInput bottomLine = new DigitalInput(0);
-  DigitalInput bottomLimit = new DigitalInput(0);
+  private DigitalInput topLine = new DigitalInput(0);
+  private DigitalInput topLimit = new DigitalInput(0);
+  private DigitalInput bottomLine = new DigitalInput(0);
+  private DigitalInput bottomLimit = new DigitalInput(0);
 
   private static void moveMotor(CANSparkMax motor, DigitalInput top, DigitalInput bottom, double speed) {
     if ((speed < 0) && (bottom.get()))
