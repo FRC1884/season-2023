@@ -24,8 +24,24 @@ public abstract class DriverMap extends CommandMap {
   @Override
   public void registerCommands() {
     var swerve = Swerve.getInstance();
-
     swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
+
+    HashMap<String, Command> oneMeterEventMap = new HashMap<String, Command>();
+    oneMeterEventMap.put("I mean it's alright like", new PrintCommand("I'm here"));
+    oneMeterEventMap.put("finishedPath", new PrintCommand("This works"));
+    
+    swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
+
+    getAlingmentButton().onTrue(swerve.chargingStationCommand());
+
+    getPathPlanningTestButton().onTrue(swerve.chargingStationPPAndBalance(oneMeterEventMap));
+
+    getAprilTagAlignmentButton().onTrue(swerve.alignWithAprilTag(true));
+
+    pixyCam.setDefaultCommand(pixyCam.printCommand());
+
+    getPixyCamDistanceButton().onTrue(swerve.alignWithGameObject());;
+
   }
 
 }
