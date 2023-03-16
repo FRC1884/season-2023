@@ -31,12 +31,10 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     ctreConfigs = new CTREConfigs();
-    compressor = new Compressor(1, PneumaticsModuleType.REVPH);
-    compressor.enableDigital();
-    var autoModeSelector = AutoModeSelector.getInstance();
-    SmartDashboard.putData("Red Autos", autoModeSelector.getRedChooser());
-    SmartDashboard.putData("Blue Autos", autoModeSelector.getBlueChooser());
-    SmartDashboard.putNumber("Auto Wait Time", 0);
+    // var autoModeSelector = AutoModeSelector.getInstance();
+    // SmartDashboard.putData("Red Autos", autoModeSelector.getRedChooser());
+    // SmartDashboard.putData("Blue Autos", autoModeSelector.getBlueChooser());
+    // SmartDashboard.putNumber("Auto Wait Time", 0);
     // TODO put auto chooser here. make sure to use the one from
     // robot/auto/selector/AutoModeSelector.java
 
@@ -79,14 +77,14 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     CommandScheduler.getInstance().cancelAll();
     Command autonomousCommand = null;
-    var allianceColor = DriverStation.getAlliance();
-    if (allianceColor.equals(DriverStation.Alliance.Red)) {
-       autonomousCommand = AutoModeSelector.getInstance().getRedChooser().getSelected();
-    }
-    else if (allianceColor.equals(DriverStation.Alliance.Blue)) {
-      autonomousCommand = AutoModeSelector.getInstance().getBlueChooser().getSelected();
-    }
-    SmartDashboard.putString("Alliance Colour", allianceColor.name());
+    // var allianceColor = DriverStation.getAlliance();
+    // if (allianceColor.equals(DriverStation.Alliance.Red)) {
+    //    autonomousCommand = AutoModeSelector.getInstance().getRedChooser().getSelected();
+    // }
+    // else if (allianceColor.equals(DriverStation.Alliance.Blue)) {
+    //   autonomousCommand = AutoModeSelector.getInstance().getBlueChooser().getSelected();
+    // }
+    // SmartDashboard.putString("Alliance Colour", allianceColor.name());
 
 
     if (autonomousCommand != null) {

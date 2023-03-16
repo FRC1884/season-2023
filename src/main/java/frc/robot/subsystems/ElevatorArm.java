@@ -3,7 +3,9 @@ package frc.robot.subsystems;
 import java.util.function.Supplier;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxPIDController.AccelStrategy;
 import com.revrobotics.SparkMaxLimitSwitch;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -11,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotMap.ElevatorMap;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ElevatorArm extends SubsystemBase {
     private static ElevatorArm instance;
@@ -89,16 +93,26 @@ public class ElevatorArm extends SubsystemBase {
 
     private CANSparkMax elevatorMotor, pivotMotor;
     private SparkMaxLimitSwitch forwardLimit, reverseLimit;
-    private double elevatorP, elevatorI, elevatorD;
-    private double pivotP, pivotI, pivotD;
+    private double elevatorP, elevatorI, elevatorD, elevatorFF;
+    private double pivotP, pivotI, pivotD, pivotFF;
+
+    private double elevatorTempSetpoint, pivotTempSetpoint;
+    private double elevatorMaxAccel, elevatorMaxVel;
+    private double pivotMaxAccel, pivotMaxVel;
 
     private ElevatorArm() {
         elevatorP = 5;
         elevatorI = 0;
         elevatorD = 0;
+        elevatorFF = 0.05;
+        elevatorMaxAccel = 3000;
+        elevatorMaxVel = 3000;
         pivotP = 0.1;
         pivotI = 0.001;
         pivotD = 0;
+        pivotFF = 0.05;
+        pivotMaxAccel = 3000;
+        pivotMaxVel = 3000; 
 
         elevatorMotor = new CANSparkMax(ElevatorMap.ELEVATOR_MOTOR_ID, MotorType.kBrushless);
         pivotMotor = new CANSparkMax(ElevatorMap.PIVOT_MOTOR_ID, MotorType.kBrushless);
@@ -110,27 +124,58 @@ public class ElevatorArm extends SubsystemBase {
         reverseLimit = elevatorMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
         reverseLimit.enableLimitSwitch(true);
 
-
-        getEncoderPosition();
-        elevatorMotor.setClosedLoopRampRate(0.05);
-        pivotMotor.setClosedLoopRampRate(0.05);
-
-        setMotorPID(elevatorMotor, elevatorP, elevatorI, elevatorD);
+        setMotorPID(elevatorMotor, elevatorP, elevatorI, elevatorD, elevatorFF);
         elevatorMotor.getPIDController().setIZone(0);
         elevatorMotor.getPIDController().setFF(0.000156);
         elevatorMotor.getPIDController().setOutputRange(-1, 1);
 
-        setMotorPID(pivotMotor, pivotP, pivotI, pivotD);
-        
+        setMotorPID(pivotMotor, pivotP, pivotI, pivotD, pivotFF);
+        elevatorMotor.setIdleMode(IdleMode.kBrake);
+        pivotMotor.setIdleMode(IdleMode.kBrake);
+
+        elevatorMotor.getPIDController().setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, 0);
+        elevatorMotor.getPIDController().setSmartMotionMaxAccel(elevatorMaxAccel, 0);
+        elevatorMotor.getPIDController().setSmartMotionMaxVelocity(elevatorMaxVel, 0);
+        elevatorMotor.getPIDController().setSmartMotionAllowedClosedLoopError(1, 0);
+        elevatorMotor.getPIDController().setSmartMotionMinOutputVelocity(1, 0);
+
+        pivotMotor.getPIDController().setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, 0);
+        pivotMotor.getPIDController().setSmartMotionMaxAccel(pivotMaxAccel, 0);
+        pivotMotor.getPIDController().setSmartMotionMaxVelocity(pivotMaxVel, 0);
+        pivotMotor.getPIDController().setSmartMotionAllowedClosedLoopError(1, 0);
+        pivotMotor.getPIDController().setSmartMotionMinOutputVelocity(1, 0);
+
         elevatorMotor.burnFlash();
         pivotMotor.burnFlash();
+        SmartDashboard.putNumber("Elevator velocity limit", 3000);
+        SmartDashboard.putNumber("Elevator acceleration limit", 3000);
+        SmartDashboard.putNumber("Pivot velocity limit", 3000);
+        SmartDashboard.putNumber("Pivot acceleration limit", 3000);
+        //used to change accel and velo limits on the fly
+
+        SmartDashboard.putNumber("Elevator P", elevatorP);
+        SmartDashboard.putNumber("Elevator I", elevatorI);
+        SmartDashboard.putNumber("Elevator D", elevatorD);
+        SmartDashboard.putNumber("Elevator FF", elevatorFF);
+
+        SmartDashboard.putNumber("Pivot P", elevatorP);
+        SmartDashboard.putNumber("Pivot I", elevatorI);
+        SmartDashboard.putNumber("Pivot D", elevatorD);
+        SmartDashboard.putNumber("Pivot FF", elevatorFF);
+
+
+        //used to change P and FF on the fly
+
+        SmartDashboard.putNumber("Elevator setpoint", 0);
+        SmartDashboard.putNumber("Pivot setpoint", 0);
 
     }
 
-    public void setMotorPID(CANSparkMax motor, double kP, double kI, double kD) {
+    public void setMotorPID(CANSparkMax motor, double kP, double kI, double kD, double FF) {
         motor.getPIDController().setP(kP);
         motor.getPIDController().setI(kI);
         motor.getPIDController().setD(kD);
+        motor.getPIDController().setFF(FF);
     }
 
     public void getEncoderPosition() {
@@ -154,8 +199,17 @@ public class ElevatorArm extends SubsystemBase {
     }
 
     public void movePivot(PivotPosition setPoint) {
-        pivotMotor.getPIDController().setReference(setPoint.getEncoderPos(), ControlType.kPosition);
+        pivotMotor.getPIDController().setReference(setPoint.getEncoderPos(), ControlType.kSmartMotion);
     }
+
+    public void moveElevatorTemp() {
+        elevatorMotor.getPIDController().setReference(elevatorTempSetpoint, ControlType.kSmartMotion);
+    }
+
+    public void movePivotTemp() {
+        pivotMotor.getPIDController().setReference(pivotTempSetpoint, ControlType.kSmartMotion);
+    }
+
 
     public void movePivot(double input) {
         pivotMotor.set(input);
@@ -202,6 +256,34 @@ public class ElevatorArm extends SubsystemBase {
         SmartDashboard.putNumber("Pivot Encoder", pivotMotor.getEncoder().getPosition());
         SmartDashboard.putNumber("Elevator Encoder", elevatorMotor.getEncoder().getPosition());
         getEncoderPosition();
+
+        elevatorP = SmartDashboard.getNumber("Elevator P", elevatorP);
+        elevatorI = SmartDashboard.getNumber("Elevator I", elevatorI);
+        elevatorD = SmartDashboard.getNumber("Elevator D", elevatorD);
+        pivotP = SmartDashboard.getNumber("Pivot P", pivotP);
+        pivotI = SmartDashboard.getNumber("Pivot I", pivotI);
+        pivotD = SmartDashboard.getNumber("Pivot D", pivotD);
+        elevatorFF = SmartDashboard.getNumber("Elevator FF", elevatorFF);
+        pivotFF = SmartDashboard.getNumber("Pivot FF", pivotFF);
+        setMotorPID(elevatorMotor, elevatorP, elevatorI, elevatorD, elevatorFF);
+        setMotorPID(pivotMotor, pivotP, pivotI, pivotD, pivotFF);
+
+        elevatorTempSetpoint = SmartDashboard.getNumber("Elevator setpoint", 0);
+        pivotTempSetpoint = SmartDashboard.getNumber("Pivot setpoint", 0);
+        
+        elevatorMotor.getPIDController()
+                .setSmartMotionMaxAccel(SmartDashboard.getNumber("Elevator acceleration limit", elevatorMaxAccel), 0);
+        elevatorMotor.getPIDController()
+                .setSmartMotionMaxVelocity(SmartDashboard.getNumber("Elevator velocity limit", elevatorMaxVel), 0);
+
+        pivotMotor.getPIDController()
+                .setSmartMotionMaxAccel(SmartDashboard.getNumber("Pivot acceleration limit", pivotMaxAccel), 0);   
+        pivotMotor.getPIDController()
+                .setSmartMotionMaxVelocity(SmartDashboard.getNumber("Pivot velocity limit", pivotMaxVel), 0);
+        
+
+
+        
     }
 
 }

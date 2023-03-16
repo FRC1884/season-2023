@@ -20,7 +20,7 @@ public abstract class OperatorMap extends CommandMap {
   // public abstract JoystickButton getStowButton();
 
   // public abstract JoystickButton getSingleSubstationButton();
-  
+
   // public abstract JoystickButton getMiddleScoreButton();
 
   // public abstract JoystickButton getTopScoreButton();
@@ -53,11 +53,14 @@ public abstract class OperatorMap extends CommandMap {
                 elevatorArm)));
     getElevatorResetButton().onTrue(elevatorArm.resetElevatorMotor());
     // getStowButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.STOW));
-    // getSingleSubstationButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.SINGLE_SUBSTATION));
-    // getMiddleScoreButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.MIDDLE));
+    // getSingleSubstationButton().onTrue(elevatorArm.moveToSetPoint(() ->
+    // SetPoint.SINGLE_SUBSTATION));
+    // getMiddleScoreButton().onTrue(elevatorArm.moveToSetPoint(() ->
+    // SetPoint.MIDDLE));
     // getTopScoreButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.TOP));
     // getGroundButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.GROUND));
-    // getDefaultButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.DEFAULT));
+    // getDefaultButton().onTrue(elevatorArm.moveToSetPoint(() ->
+    // SetPoint.DEFAULT));
 
     MotorIntake motorIntake = MotorIntake.getInstance();
     motorIntake.setDefaultCommand(
