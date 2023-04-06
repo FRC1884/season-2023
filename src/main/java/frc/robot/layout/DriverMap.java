@@ -16,11 +16,7 @@ public abstract class DriverMap extends CommandMap {
 
   abstract ChassisSpeeds getChassisSpeeds();
 
-  public abstract JoystickButton getFrictionPadDeployButton();
-
-  public abstract JoystickButton getFrictionPadRetractButton();
-
-  void registerSwerve() {
+  private void registerSwerve() {
     var swerve = Swerve.getInstance();
     swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
   }
@@ -28,9 +24,8 @@ public abstract class DriverMap extends CommandMap {
   @Override
   public void registerCommands() {
 
-    if (Config.Subsystems.SWERVE_ENABLED) {
+    if (Config.Subsystems.SWERVE_ENABLED)
       registerSwerve();
-    }
-    
+
   }
 }

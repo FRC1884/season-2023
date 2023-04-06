@@ -145,6 +145,7 @@ public class RobotMap {
   public static class ControllerMap {
     public static final int DRIVER_JOYSTICK = 0;
     public static final int OPERATOR_JOYSTICK = 1;
+    public static final int TESTER_JOYSTICK = 2;
     public static final double STICK_DEADBAND = 0.1;
   }
 
@@ -157,36 +158,90 @@ public class RobotMap {
   }
 
   public static class MotorIntakeMap {
-    public static final int MOTOR_ID = 2;
+    public static final int MOTOR_ID = 4;
   }
 
-  public static class ElevatorMap {
+  public static class ElevatorPivotMap {
+    // Motor IDs
     public static final int ELEVATOR_MOTOR_ID = 1;
-    public static final int BOTTOM_PORT = 0;
-    public static final int TOP_PORT = 1;
-    public static final double MIDPOINT1 = 20; // arbitrary
-
+    public static final int ELEVAOTR_MOTOR2_ID = 2;
     public static final int PIVOT_MOTOR_ID = 3;
-    public static final double PIVOT_BOTTOM = 10; // arbitrary
-    public static final double PIVOT_TOP = 20; // arbitrary
-    public static final double MIDPOINT2 = 15; // arbitrary
 
-    public static final double PIVOT_KS = 0;
-    public static final double PIVOT_KG = 0;
-    public static final double PIVOT_KV = 0;
-    public static final double PIVOT_KA = 0;
+    // L + Gear Ratio
+    public static final int ELEVATOR_RATIO = 12;
+    public static final double PIVOT_RATIO = 562.5;
 
-    public static final double ELEVATOR_KS = 0;
-    public static final double ELEVATOR_KG = 0;
-    public static final double ELEVATOR_KV = 0;
-    public static final double ELEVATOR_KA = 0;
-  }
+    // Profile Constants
+    public static final double ELEVATOR_MAX_VELOCITY = 10;
+    public static final double ELEVATOR_MAX_ACCELERATION = 3;
+    public static final double ELEVATOR_kDt = 0.02;
 
-  public static class FrictionPadMap {
-    // TODO: Change these ports
-    public static final int FOWARD_CHANNEL = 0;
-    public static final int REVERSE_CHANNEL = 3;
+    public static final double PIVOT_MAX_VELOCITY = 10;
+    public static final double PIVOT_MAX_ACCELERATION = 3;
+    public static final double PIVOT_kDt = 0.02;
 
+    // PID
+    public static final double ELEVATOR_kP = 0.051;
+    public static final double ELEVATOR_kI = 0.0000;
+    public static final double ELEVATOR_kD = 0.0000;
+    public static final double ELEVATOR_TOLERANCE = 0.5;
+
+    public static final double PIVOT_kP = 0.051;
+    public static final double PIVOT_kI = 0.0000;
+    public static final double PIVOT_kD = 0.0000;
+    public static final double PIVOT_TOLERANCE = 0.5;
+    
+    // Setpoints
+    public enum SetPoint {
+      ZERO(ElevPoint.STOW, PivotPoint.STOW),
+      TOP(ElevPoint.TOP, PivotPoint.TOP);
+
+      private ElevPoint elev;
+      private PivotPoint pivot;
+
+      SetPoint(ElevPoint elev, PivotPoint pivot) { 
+        this.elev = elev;
+        this.pivot = pivot;
+      }
+
+      public ElevPoint getElev() {
+        return this.elev;
+      }
+
+      public PivotPoint getPivot() {
+        return this.pivot;
+      }
+    }
+
+    public enum ElevPoint {
+      STOW(0),
+      TOP(50);
+
+      private double encoderValue;
+
+      ElevPoint(double encoderValue) { 
+        this.encoderValue = encoderValue;
+      }
+
+      public double getSetpoint() {
+        return this.encoderValue;
+      }
+    }
+
+    public enum PivotPoint {
+      STOW(0),
+      TOP(-1);
+
+      private double encoderValue;
+
+      PivotPoint(double encoderValue) { 
+        this.encoderValue = encoderValue;
+      }
+
+      public double getSetpoint() {
+        return this.encoderValue;
+      }
+    }
   }
 
   public static class PPMap {
@@ -194,6 +249,65 @@ public class RobotMap {
     public static final int MAX_ACCELERATION = 4;
   }
 
+  public static class MotionProfileMap {
+    //MOTOR IDs
+    public static final int TEST_MOTOR_ID = 1;
+
+    // Gear Ratio
+    public static final int GEAR_RATIO = 1;
+    
+    // Feed Forward
+    // public static final double kS = 0;
+    // public static final double kV = 1.5;
+
+    // Profile Constants
+    public static final double MAX_VELOCITY = 500;
+    public static final double MAX_ACCELERATION = 100;
+    public static final double kDt = 0.02;
+
+    // PID
+    public static final double kP = 0.1;
+    public static final double kI = 0.0000;
+
+    public static final double kD = 0.0000;
+    // public static final int kIZone = 0;
+    // public static final int kFF = 0;
+    // public static final int MIN_OUTPUT = 0;
+    // public static final int MAX_OUTPUT = GEAR_RATIO * 42;
+    public static final double TOLERANCE = 10;
+    
+    // Setpoints
+    public enum TestSetpoint {
+      ZERO(0, GEAR_RATIO),
+      HALF(125*4.5/6, GEAR_RATIO),
+      FULL(125*4.5/3, GEAR_RATIO),
+      NEGHALF(-125*4.5/6, GEAR_RATIO),
+      NEGFULL(-125*4.5/3, GEAR_RATIO);
+
+
+      private double encoderValue;
+      private double degrees;
+      private double gearRatio;
+
+      // Is the resolution of a NEO 42 ticks per rev?
+      TestSetpoint(double degrees, int gearRatio) { 
+        this.degrees = degrees;
+        this.gearRatio = gearRatio;
+        // (Resolution * gearRatio) / full rotation in degrees === ticks per degree with given gear ratio
+        this.encoderValue = this.degrees;
+      }
+
+      public double getSetpointInDegrees() {
+        return this.degrees;
+      }
+
+      public double getSetpoint() {
+        return this.encoderValue;
+      }
+
+    }
+  }
+  
   public static class LimelightMap {
     public static final Pose3d ROBOT_SPACE_POSE = new Pose3d(
       new Translation3d(0.5, 0.5, 0.5),
@@ -203,4 +317,5 @@ public class RobotMap {
     public static final double OFFSET_FROM_TAG = 0.8; //In meters
 
   }
+
 }

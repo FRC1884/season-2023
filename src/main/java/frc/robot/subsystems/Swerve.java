@@ -73,6 +73,21 @@ public class Swerve extends SubsystemBase {
     };
 
     odometry = new SwerveDriveOdometry(DriveMap.KINEMATICS, getYaw(), getModulePositions());
+
+    var swerveTab = Shuffleboard.getTab("Swerve");
+
+    swerveTab.addDouble("module 0 position", () -> getModulePositions()[0].distanceMeters);
+    swerveTab.addDouble("module 1 position", () -> getModulePositions()[1].distanceMeters);
+    swerveTab.addDouble("module 2 position", () -> getModulePositions()[2].distanceMeters);
+    swerveTab.addDouble("module 3 position", () -> getModulePositions()[3].distanceMeters);
+    for (SwerveModule mod : modules) {
+      swerveTab.addDouble("Mod " + mod.moduleNumber + " Cancoder", () -> mod.getCanCoder().getDegrees());
+      swerveTab.addDouble("Mod " + mod.moduleNumber + " Integrated", () -> mod.getPosition().angle.getDegrees());
+      swerveTab.addDouble("Mod " + mod.moduleNumber + " Velocity", () -> mod.getState().speedMetersPerSecond);
+    }
+
+    // won't update for now
+    swerveTab.add("Pose", getPose());
   }
 
   public void resetModulesToAbsolute() {
@@ -170,7 +185,7 @@ public class Swerve extends SubsystemBase {
         eventMap);
   }
 
-  private SequentialCommandGroup followTrajectoryCommand(PathPlannerTrajectory traj,
+  private Command followTrajectoryCommand(PathPlannerTrajectory traj,
       boolean isFirstPath) {
 
     // Create PIDControllers for each movement (and set default values)
@@ -178,11 +193,11 @@ public class Swerve extends SubsystemBase {
     PIDController yPID = new PIDController(5.0, 0.0, 0.0);
     PIDController thetaPID = new PIDController(1.0, 0.0, 0.0);
 
-    var swerveTab = Shuffleboard.getTab("Swerve");
+    // var swerveTab = Shuffleboard.getTab("Swerve");
 
-    swerveTab.add("x-input PID Controller", xPID);
-    swerveTab.add("y-input PID Controller", yPID);
-    swerveTab.add("rot PID Controller", thetaPID);
+    // swerveTab.add("x-input PID Controller", xPID);
+    // swerveTab.add("y-input PID Controller", yPID);
+    // swerveTab.add("rot PID Controller", thetaPID);
 
     return new SequentialCommandGroup(
         new InstantCommand(
@@ -197,7 +212,7 @@ public class Swerve extends SubsystemBase {
             traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this));// KEEP IT OPEN LOOP
   }
 
-  public SequentialCommandGroup followTrajectoryCommand(String path, boolean isFirstPath) {
+  public Command followTrajectoryCommand(String path, boolean isFirstPath) {
     PathPlannerTrajectory traj = PathPlanner.loadPath(path, 2, 2);
     PIDController xPID = new PIDController(5.0, 0.0, 0.0);
     PIDController yPID = new PIDController(5.0, 0.0, 0.0);
@@ -214,6 +229,13 @@ public class Swerve extends SubsystemBase {
             }),
         new PPSwerveControllerCommand(traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this));
   }
+
+  private PathPlannerTrajectory generateDirectPath(Translation2d startPoint, Translation2d endPoint) {
+    return PathPlanner.generatePath(
+      new PathConstraints(4, 2), 
+      new PathPoint(startPoint, getYaw()), 
+      new PathPoint(endPoint, getYaw()));
+  } 
 
   public Command followTrajectoryCommand(Supplier<PathPlannerTrajectory> pathSupplier,
       boolean isFirstPath) {
@@ -268,19 +290,7 @@ public class Swerve extends SubsystemBase {
       resetModulesToAbsolute();
     }
 
-    var swerveTab = Shuffleboard.getTab("Swerve");
-
     odometry.update(getYaw(), getModulePositions());
-    for (SwerveModule mod : modules) {
-      swerveTab.add("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-      swerveTab.add("Mod " + mod.moduleNumber + " Integrated", mod.getPosition().angle.getDegrees());
-      swerveTab.add("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-    }
 
-    swerveTab.add("Pose", getPose());
-    swerveTab.add("module 0 position", getModulePositions()[0].distanceMeters);
-    swerveTab.add("module 1 position", getModulePositions()[1].distanceMeters);
-    swerveTab.add("module 2 position", getModulePositions()[2].distanceMeters);
-    swerveTab.add("module 3 position", getModulePositions()[3].distanceMeters);
   }
 }
