@@ -8,6 +8,7 @@ import frc.robot.Config;
 import frc.robot.subsystems.ElevatorArm;
 import frc.robot.subsystems.MotionProfile;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 import frc.robot.util.controllers.CommandMap;
 import frc.robot.util.controllers.GameController;
 import frc.robot.RobotMap.ElevatorPivotMap;
@@ -36,6 +37,10 @@ public abstract class TesterMap extends CommandMap {
   private void registerSwerve() {
     var swerve = Swerve.getInstance();
     swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
+    getTopButton().onTrue(swerve.alignWithGridCommand(Vision.Position.LEFT_CONE));
+    getHalfButton().onTrue(swerve.alignWithGridCommand(Vision.Position.CUBE));
+    getZeroButton().onTrue(swerve.alignWithGridCommand(Vision.Position.RIGHT_CONE));
+    
   }
 
   private void registerElevatorArm() {
