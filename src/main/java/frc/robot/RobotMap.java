@@ -310,11 +310,11 @@ public class RobotMap {
   
   public static class LimelightMap {
     public static final Pose3d ROBOT_SPACE_POSE = new Pose3d(
-      new Translation3d(0.5, 0.5, 0.5),
-      new Rotation3d(0, 0, 0)
+      new Translation3d(0.2667, 0.2667, 0.4318),
+      new Rotation3d(0, 10, 0)
     );
 
-    public static final double OFFSET_FROM_TAG = 0.8; //In meters
+    public static final double OFFSET_FROM_TAG = 0.1; //In meters
 
   }
 

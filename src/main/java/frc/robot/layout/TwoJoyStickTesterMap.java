@@ -40,6 +40,12 @@ public class TwoJoyStickTesterMap extends TesterMap {
     return controller.getButton(Button.BUTTON_X);
   }
 
+  
+  @Override
+  public JoystickButton getPrintButton(){
+    return controller.getButton(Button.BUTTON_Y);
+  }
+
   @Override
   public double getOnButton() {
     return controller.getTrigger(Trigger.BUTTON_RIGHT_TRIGGER);
@@ -54,6 +60,7 @@ public class TwoJoyStickTesterMap extends TesterMap {
   public double getRightYAxis() {
     return controller.getAxis(Axis.AXIS_RIGHT_Y);
   }
+
 
   @Override
   public void registerCommands() {

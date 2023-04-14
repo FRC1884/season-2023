@@ -1,6 +1,7 @@
 package frc.robot.layout;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -28,6 +29,8 @@ public abstract class TesterMap extends CommandMap {
 
   abstract JoystickButton getZeroButton();
 
+  abstract JoystickButton getPrintButton();
+
   abstract double getOnButton();
 
   abstract double getLeftYAxis();
@@ -36,10 +39,12 @@ public abstract class TesterMap extends CommandMap {
 
   private void registerSwerve() {
     var swerve = Swerve.getInstance();
-    swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
-    getTopButton().onTrue(swerve.alignWithGridCommand(Vision.Position.LEFT_CONE));
-    getHalfButton().onTrue(swerve.alignWithGridCommand(Vision.Position.CUBE));
-    getZeroButton().onTrue(swerve.alignWithGridCommand(Vision.Position.RIGHT_CONE));
+    var vision = Vision.getInstance();
+    // swerve.setDefaultCommand(swerve.driveCommand(this::getChassisSpeeds));
+    // getTopButton().onTrue(swerve.alignWithGridCommand(Vision.Position.LEFT_CONE));
+    // getHalfButton().onTrue(swerve.alignWithGridCommand(Vision.Position.CUBE));
+    // getZeroButton().onTrue(swerve.alignWithGridCommand(Vision.Position.RIGHT_CONE));
+    getPrintButton().onTrue(new InstantCommand(vision::printPose));
     
   }
 

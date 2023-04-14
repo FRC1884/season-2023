@@ -9,6 +9,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LimelightHelpers;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,9 +28,9 @@ public class Vision extends SubsystemBase {
     }
 
     public enum Position {
-        LEFT_CONE( new Pose2d(0, 0, new Rotation2d())),
-        CUBE(new Pose2d(0, 0, new Rotation2d())),
-        RIGHT_CONE(new Pose2d(0, 0, new Rotation2d()));
+        LEFT_CONE( new Pose2d(0.5, 1, new Rotation2d())),
+        CUBE(new Pose2d(0, 1, new Rotation2d())),
+        RIGHT_CONE(new Pose2d(-0.5, 1, new Rotation2d()));
 
         private final Pose2d offset;
 
@@ -74,6 +75,12 @@ public class Vision extends SubsystemBase {
         ty = networkTable.getEntry("ty"); // Vertical offset from crosshair to target (-20.5, 20.5)
         ta = networkTable.getEntry("ta"); // Target area (Between 0% and 100%)
 
+        var visionTab = Shuffleboard.getTab("Vision");
+
+        visionTab.add("LimelightX", currentX);
+        visionTab.add("LimelightY", currentY);
+        visionTab.add("LimelightArea", currentA);
+
     }
 
     public boolean getHasTarget() {
@@ -117,7 +124,7 @@ public class Vision extends SubsystemBase {
     public Pose2d addGridOffset(Pose3d originalOffset, Pose2d gridOffset) {
         return new Pose2d(
                 originalOffset.getX() + gridOffset.getX(),
-                originalOffset.getY() + gridOffset.getY() + LimelightMap.OFFSET_FROM_TAG,
+                originalOffset.getZ() + gridOffset.getY() + LimelightMap.OFFSET_FROM_TAG,
                 originalOffset.getRotation().toRotation2d());
     }
     
@@ -142,7 +149,10 @@ public class Vision extends SubsystemBase {
         return target_Fiducials[0];
     }
     
-    
+    public void printPose(){
+        System.out.println(currentPose);
+    }
+
     @Override
     public void periodic() {
         llresults = LimelightHelpers.getLatestResults("");
@@ -153,11 +163,6 @@ public class Vision extends SubsystemBase {
         currentX = tx.getDouble(0.0);
         currentY = ty.getDouble(0.0);
         currentA = ta.getDouble(0.0);
-
-        var visionTab = Shuffleboard.getTab("Vision");
-
-        visionTab.add("LimelightX", currentX);
-        visionTab.add("LimelightY", currentY);
-        visionTab.add("LimelightArea", currentA);
+        
     }
 }
