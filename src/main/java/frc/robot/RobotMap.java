@@ -103,40 +103,40 @@ public class RobotMap {
     /* Module Specific Constants */
     /* Front Left Module - Module 0 */
     public static final class FrontLeft {
-      public static final int DRIVE_ID = 5;
-      public static final int ROTATOR_ID = 6;
-      public static final int ENCODER_ID = 11;
-      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(194.5);
+      public static final int DRIVE_ID = 7;
+      public static final int ROTATOR_ID = 8;
+      public static final int ENCODER_ID = 10;
+      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(105.2);
       public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(DRIVE_ID, ROTATOR_ID, ENCODER_ID,
           OFFSET);
     }
 
     /* Front Right Module - Module 1 */
     public static final class FrontRight {
-      public static final int DRIVE_ID = 3;
-      public static final int ROTATOR_ID = 4;
-      public static final int ENCODER_ID = 13;
-      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(7.65);
+      public static final int DRIVE_ID = 1;
+      public static final int ROTATOR_ID = 2;
+      public static final int ENCODER_ID = 11;
+      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(317.4);
       public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(DRIVE_ID, ROTATOR_ID, ENCODER_ID,
           OFFSET);
     }
 
     /* Back Left Module - Module 2 */
     public static final class BackLeft {
-      public static final int DRIVE_ID = 7;
-      public static final int ROTATOR_ID = 8;
-      public static final int ENCODER_ID = 12;
-      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(288.37);
+      public static final int DRIVE_ID = 5;
+      public static final int ROTATOR_ID = 6;
+      public static final int ENCODER_ID = 13;
+      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(100.2);
       public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(DRIVE_ID, ROTATOR_ID, ENCODER_ID,
           OFFSET);
     }
 
     /* Back Right Module - Module 3 */
     public static final class BackRight {
-      public static final int DRIVE_ID = 1;
-      public static final int ROTATOR_ID = 2;
-      public static final int ENCODER_ID = 10;
-      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(9.67);
+      public static final int DRIVE_ID = 3;
+      public static final int ROTATOR_ID = 4;
+      public static final int ENCODER_ID = 12;
+      public static final Rotation2d OFFSET = Rotation2d.fromDegrees(3.9);
       public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(DRIVE_ID, ROTATOR_ID, ENCODER_ID,
           OFFSET);
     }
