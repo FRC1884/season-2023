@@ -17,17 +17,17 @@ public abstract class OperatorMap extends CommandMap {
 
   abstract JoystickButton getIntakeSwitchModeButton();
 
-  // abstract JoystickButton getStowButton();
+  abstract JoystickButton getStowButton();
 
-  // abstract JoystickButton getSingleSubstationButton();
+  abstract JoystickButton getSingleSubstationButton();
 
-  // abstract JoystickButton getMiddleScoreButton();
+  abstract JoystickButton getMiddleScoreButton();
 
-  // abstract JoystickButton getTopScoreButton();
+  abstract JoystickButton getTopScoreButton();
 
-  // abstract JoystickButton getGroundButton();
+  abstract JoystickButton getGroundButton();
 
-  // abstract JoystickButton getDefaultButton();
+  abstract JoystickButton getDefaultButton();
 
   abstract double getForwardIntakeValue();
 
@@ -50,15 +50,15 @@ public abstract class OperatorMap extends CommandMap {
         new RepeatCommand(
             new RunCommand(() -> elevatorArm.moveElevatorAndPivot(-getLeftYAxis() * 0.5, -getRightYAxis() * 0.35),
                 elevatorArm)));
-    // getStowButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.STOW));
-    // getSingleSubstationButton().onTrue(elevatorArm.moveToSetPoint(() ->
-    // SetPoint.SINGLE_SUBSTATION));
-    // getMiddleScoreButton().onTrue(elevatorArm.moveToSetPoint(() ->
-    // SetPoint.MIDDLE));
-    // getTopScoreButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.TOP));
-    // getGroundButton().onTrue(elevatorArm.moveToSetPoint(() -> SetPoint.GROUND));
-    // getDefaultButton().onTrue(elevatorArm.moveToSetPoint(() ->
-    // SetPoint.DEFAULT));
+    getStowButton().onTrue(elevatorArm.move(() -> SetPoint.STOW));
+    getSingleSubstationButton().onTrue(elevatorArm.move(() ->
+    SetPoint.SINGLE_SUBSTATION));
+    getMiddleScoreButton().onTrue(elevatorArm.move(() ->
+    SetPoint.MIDDLE));
+    getTopScoreButton().onTrue(elevatorArm.move(() -> SetPoint.TOP));
+    getGroundButton().onTrue(elevatorArm.move(() -> SetPoint.GROUND));
+    getDefaultButton().onTrue(elevatorArm.move(() ->
+    SetPoint.DEFAULT));
   }
 
   private void registerMotorIntake() {

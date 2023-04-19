@@ -8,14 +8,14 @@ import frc.robot.util.controllers.Logitech.Version;
 public class Config {
   public class Subsystems {
     public static final boolean SWERVE_ENABLED = true;
-    public static final boolean INTAKE_MOTOR_ENABLED = false;
-    public static final boolean ELEVATOR_ARM_ENABLED = false;
+    public static final boolean INTAKE_MOTOR_ENABLED = true;
+    public static final boolean ELEVATOR_ARM_ENABLED = true;
   }
 
   public class Controllers {
-    public static final boolean DRIVER_ENABLED = false;
-    public static final boolean OPERATOR_ENABLED = false;
-    public static final boolean TESTER_ENABLED = true;
+    public static final boolean DRIVER_ENABLED = true;
+    public static final boolean OPERATOR_ENABLED = true;
+    public static final boolean TESTER_ENABLED = false;
   }
 
   public static ButtonMap getDriverController() {
