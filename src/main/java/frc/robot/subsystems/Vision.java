@@ -109,9 +109,7 @@ public class Vision extends SubsystemBase {
         if (numAprilTags > 0) {
             LimelightTarget_Fiducial targetTag = getClosestTarget(llresults.targetingResults.targets_Fiducials);
             tempOffset = targetTag.getTargetPose_RobotSpace();
-            System.out.println("SIN CITY " + tempOffset);
             tempOffset = tempOffset.plus(LimelightMap.ROBOT_SPACE_POSE);
-            System.out.println("THATS TOO EASY " + tempOffset);
             offset = addGridOffset(tempOffset, pos.getOffset());
             
         }
