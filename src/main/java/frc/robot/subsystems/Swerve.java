@@ -19,9 +19,12 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -42,6 +45,8 @@ import frc.robot.RobotMap.ChargingStationMap;
 import frc.robot.RobotMap.DriveMap;
 import frc.robot.RobotMap.PPMap;
 import frc.robot.util.SwerveModule;
+import frc.robot.util.GridPosition.GridSetpoint;
+import frc.robot.util.GridPosition;
 
 public class Swerve extends SubsystemBase {
   private static Swerve instance;
@@ -57,6 +62,8 @@ public class Swerve extends SubsystemBase {
   private WPI_Pigeon2 gyro;
 
   private Vision limelight;
+
+  private GridPosition gridPosition = GridPosition.getInstance();
 
   // Camera
   PIDController speedController = new PIDController(0.0001, 0, 0);
@@ -211,7 +218,8 @@ public class Swerve extends SubsystemBase {
               }
             }),
         new ProxyCommand(new PPSwerveControllerCommand(
-            traj.get(), this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this))));// KEEP IT OPEN LOOP
+            traj.get(), this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this))));// KEEP IT OPEN
+                                                                                                     // LOOP
   }
 
   public Command followTrajectoryCommand(String path, boolean isFirstPath) {
@@ -229,7 +237,7 @@ public class Swerve extends SubsystemBase {
                     getYaw(), getModulePositions(), traj.getInitialHolonomicPose());
               }
             }),
-        new PPSwerveControllerCommand(traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this), 
+        new PPSwerveControllerCommand(traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this),
         new InstantCommand(() -> System.out.println("END PATH")));
   }
 
@@ -258,15 +266,17 @@ public class Swerve extends SubsystemBase {
           return PathPlanner.generatePath(
               new PathConstraints(2, 2),
               new PathPoint(new Translation2d(currentPos.getX(), currentPos.getY()),
-              offset.getRotation(), Rotation2d.fromDegrees(heading)), // position, heading(direction of travel),
-                                              // holonomic rotation
+                  offset.getRotation(), Rotation2d.fromDegrees(heading)), // position, heading(direction of travel),
+              // holonomic rotation
               new PathPoint(new Translation2d(currentPos.getX(), currentPos.getY() - (sign * offset.getX())),
                   offset.getRotation(), Rotation2d.fromDegrees(heading)), // position,
-                                                                                                   // heading(direction
-                                                                                                   // of travel),
-                                                                                                   // holonomic rotation
-              new PathPoint(new Translation2d(currentPos.getX() + (sign * offset.getY()), currentPos.getY() - (sign * offset.getX())),
-              offset.getRotation(), Rotation2d.fromDegrees(heading)));
+                                                                          // heading(direction
+                                                                          // of travel),
+                                                                          // holonomic rotation
+              new PathPoint(
+                  new Translation2d(currentPos.getX() + (sign * offset.getY()),
+                      currentPos.getY() - (sign * offset.getX())),
+                  offset.getRotation(), Rotation2d.fromDegrees(heading)));
         }, false)).unless(() -> !limelight.getHasTarget());
 
   }
@@ -278,8 +288,8 @@ public class Swerve extends SubsystemBase {
     return new FunctionalCommand(
         () -> {
           // Init
-          System.out.println("Balancing");
         },
+
         () -> {
           if (pid.calculate(gyro.getRoll() + gyro.getPitch()) > ChargingStationMap.MAX_VELOCITY) {
             this.drive(new ChassisSpeeds(-ChargingStationMap.MAX_VELOCITY, .0, 0), true);
@@ -297,12 +307,52 @@ public class Swerve extends SubsystemBase {
         this);
   }
 
+  public PathPlannerTrajectory getSetpointPath(GridSetpoint destination) {
+    return PathPlanner.generatePath(new PathConstraints(4, 2),
+        new PathPoint(odometry.getPoseMeters().getTranslation(), odometry.getPoseMeters().getRotation()),
+        new PathPoint(new Translation2d(odometry.getPoseMeters().getX(), destination.getPosition().getY()),
+            odometry.getPoseMeters().getRotation()),
+        new PathPoint(new Translation2d(destination.getPosition().getX(), destination.getPosition().getY()),
+            odometry.getPoseMeters().getRotation()));
+  }
+
+  public Command followSetpointTrajectoryCommand(GridSetpoint destination, boolean isFirstPath) {
+    PathPlannerTrajectory traj = getSetpointPath(destination);
+    PIDController xPID = new PIDController(5.0, 0.0, 0.0);
+    PIDController yPID = new PIDController(5.0, 0.0, 0.0);
+    PIDController thetaPID = new PIDController(1.0, 0.0, 0.0);
+
+    return new SequentialCommandGroup(
+        new InstantCommand(
+            () -> {
+              // Reset odometry for the first path you run during auto
+              if (isFirstPath) {
+                odometry.resetPosition(
+                    getYaw(), getModulePositions(), traj.getInitialHolonomicPose());
+              }
+            }),
+        new PPSwerveControllerCommand(traj, this::getPose, xPID, yPID, thetaPID, speeds -> drive(speeds, true), this),
+        new InstantCommand(() -> System.out.println("END PATH")));
+  }
+
+  private void updateOdometryWithLimeLight() {
+    Pose3d pose = limelight.getCurrentPose();
+    Rotation3d rot = pose.getRotation();
+    Translation3d trans = pose.getTranslation();
+    odometry.resetPosition(getYaw(), getModulePositions(),
+        new Pose2d(trans.getX(), trans.getY(), new Rotation2d(rot.getX(), rot.getY())));
+  }
+
   @Override
   public void periodic() {
     if (DriverStation.isDisabled()) {
       resetModulesToAbsolute();
     }
 
-    odometry.update(getYaw(), getModulePositions());
+    if (limelight.getHasTarget()) {
+      updateOdometryWithLimeLight();
+    } else {
+      odometry.update(getYaw(), getModulePositions());
+    }
   }
 }
