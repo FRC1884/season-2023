@@ -30,5 +30,8 @@
     "activityBar.background": "#462511",
     "titleBar.activeBackground": "#623418",
     "titleBar.activeForeground": "#FDFAF8"
-  }
+  },
+  "githubPullRequests.ignoredPullRequestBranches": [
+    "master"
+  ]
 }
