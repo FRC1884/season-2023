@@ -23,18 +23,7 @@ public class AutoModeSelector implements AutoModeList {
   }
 
   public void updateAutoModeSelector() {
-    modeChooserRed.setDefaultOption("DO_NOTHING", AutoModeListRed.DO_NOTHING.getAuto());
-    modeChooserBlue.setDefaultOption("DO_NOTHING", AutoModeListBlue.DO_NOTHING.getAuto());
-
-    for (AutoModeListRed auto : AutoModeListRed.values()) {
-      modeChooserRed.addOption(auto.name(), auto.getAuto());
-    }
-
-    for (AutoModeListBlue auto : AutoModeListBlue.values()) {
-      modeChooserBlue.addOption(auto.name(), auto.getAuto());
-    }
   }
-
   public SendableChooser<Command> getRedChooser() {
     return modeChooserRed;
   }
